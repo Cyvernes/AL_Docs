@@ -1,0 +1,7 @@
+Plot tools
+==================
+
+.. automodule:: plot_tools
+   :members:
+   :undoc-members:
+   :show-inheritance:

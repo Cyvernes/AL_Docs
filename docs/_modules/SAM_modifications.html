@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SAM_modifications &mdash; Active Learning For Connectomics 0.1 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Active Learning For Connectomics
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../modules.html">ActiveLearningForConnectomics</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Active Learning For Connectomics</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Module code</a></li>
+      <li class="breadcrumb-item active">SAM_modifications</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for SAM_modifications</h1><div class="highlight"><pre>
+<span></span><span class="c1"># from segment_anything import SamPredictor</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">torch</span>
+
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span>
+<span class="kn">from</span> <span class="nn">segment_anything</span> <span class="kn">import</span> <span class="n">SamPredictor</span>
+
+
+<div class="viewcode-block" id="SamPredictorWithDropOut"><a class="viewcode-back" href="../SAM_modifications.html#SAM_modifications.SamPredictorWithDropOut">[docs]</a><span class="k">class</span> <span class="nc">SamPredictorWithDropOut</span><span class="p">(</span><span class="n">SamPredictor</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sam_model</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">use_dropout</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">sam_model</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">p</span> <span class="o">=</span> <span class="n">p</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dropout</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Dropout</span><span class="p">(</span><span class="n">p</span><span class="o">=</span><span class="n">p</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">use_dropout</span> <span class="o">=</span> <span class="n">use_dropout</span>
+
+<div class="viewcode-block" id="SamPredictorWithDropOut.setDropOutParameter"><a class="viewcode-back" href="../SAM_modifications.html#SAM_modifications.SamPredictorWithDropOut.setDropOutParameter">[docs]</a>    <span class="k">def</span> <span class="nf">setDropOutParameter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">p</span> <span class="o">=</span> <span class="n">p</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dropout</span><span class="o">.</span><span class="n">p</span> <span class="o">=</span> <span class="n">p</span></div>
+
+<div class="viewcode-block" id="SamPredictorWithDropOut.predict_torch"><a class="viewcode-back" href="../SAM_modifications.html#SAM_modifications.SamPredictorWithDropOut.predict_torch">[docs]</a>    <span class="nd">@torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">()</span>
+    <span class="k">def</span> <span class="nf">predict_torch</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">point_coords</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">],</span>
+        <span class="n">point_labels</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">],</span>
+        <span class="n">boxes</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">mask_input</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">multimask_output</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">return_logits</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method is the same than the original SamPredictor</span>
+<span class="sd">        Predict masks for the given input prompts, using the currently set image.</span>
+<span class="sd">        Input prompts are batched torch tensors and are expected to already be</span>
+<span class="sd">        transformed to the input frame using ResizeLongestSide.</span>
+
+<span class="sd">        Arguments:</span>
+<span class="sd">          point_coords (torch.Tensor or None): A BxNx2 array of point prompts to the</span>
+<span class="sd">            model. Each point is in (X,Y) in pixels.</span>
+<span class="sd">          point_labels (torch.Tensor or None): A BxN array of labels for the</span>
+<span class="sd">            point prompts. 1 indicates a foreground point and 0 indicates a</span>
+<span class="sd">            background point.</span>
+<span class="sd">          boxes (np.ndarray or None): A Bx4 array given a box prompt to the</span>
+<span class="sd">            model, in XYXY format.</span>
+<span class="sd">          mask_input (np.ndarray): A low resolution mask input to the model, typically</span>
+<span class="sd">            coming from a previous prediction iteration. Has form Bx1xHxW, where</span>
+<span class="sd">            for SAM, H=W=256. Masks returned by a previous iteration of the</span>
+<span class="sd">            predict method do not need further transformation.</span>
+<span class="sd">          multimask_output (bool): If true, the model will return three masks.</span>
+<span class="sd">            For ambiguous input prompts (such as a single click), this will often</span>
+<span class="sd">            produce better masks than a single prediction. If only a single</span>
+<span class="sd">            mask is needed, the model&#39;s predicted quality score can be used</span>
+<span class="sd">            to select the best mask. For non-ambiguous prompts, such as multiple</span>
+<span class="sd">            input prompts, multimask_output=False can give better results.</span>
+<span class="sd">          return_logits (bool): If true, returns un-thresholded masks logits</span>
+<span class="sd">            instead of a binary mask.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">          (torch.Tensor): The output masks in BxCxHxW format, where C is the</span>
+<span class="sd">            number of masks, and (H, W) is the original image size.</span>
+<span class="sd">          (torch.Tensor): An array of shape BxC containing the model&#39;s</span>
+<span class="sd">            predictions for the quality of each mask.</span>
+<span class="sd">          (torch.Tensor): An array of shape BxCxHxW, where C is the number</span>
+<span class="sd">            of masks and H=W=256. These low res logits can be passed to</span>
+<span class="sd">            a subsequent iteration as mask input.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_image_set</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                <span class="s2">&quot;An image must be set with .set_image(...) before mask prediction.&quot;</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">point_coords</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">points</span> <span class="o">=</span> <span class="p">(</span><span class="n">point_coords</span><span class="p">,</span> <span class="n">point_labels</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">points</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># Embed prompts</span>
+        <span class="n">sparse_embeddings</span><span class="p">,</span> <span class="n">dense_embeddings</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">prompt_encoder</span><span class="p">(</span>
+            <span class="n">points</span><span class="o">=</span><span class="n">points</span><span class="p">,</span>
+            <span class="n">boxes</span><span class="o">=</span><span class="n">boxes</span><span class="p">,</span>
+            <span class="n">masks</span><span class="o">=</span><span class="n">mask_input</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="c1"># Predict masks</span>
+        <span class="n">low_res_masks</span><span class="p">,</span> <span class="n">iou_predictions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">mask_decoder</span><span class="p">(</span>
+            <span class="n">image_embeddings</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dropout</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">features</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_dropout</span>
+            <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">features</span><span class="p">,</span>  <span class="c1"># the embeddings from the image encoder</span>
+            <span class="n">image_pe</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dropout</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">prompt_encoder</span><span class="o">.</span><span class="n">get_dense_pe</span><span class="p">())</span>
+            <span class="k">if</span> <span class="p">(</span><span class="kc">False</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_dropout</span><span class="p">)</span>
+            <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">prompt_encoder</span><span class="o">.</span><span class="n">get_dense_pe</span><span class="p">(),</span>  <span class="c1"># positional encoding with the shape of image_embeddings</span>
+            <span class="n">sparse_prompt_embeddings</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dropout</span><span class="p">(</span><span class="n">sparse_embeddings</span><span class="p">)</span>
+            <span class="k">if</span> <span class="p">(</span><span class="kc">False</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_dropout</span><span class="p">)</span>
+            <span class="k">else</span> <span class="n">sparse_embeddings</span><span class="p">,</span>  <span class="c1"># the embeddings of the points and boxes</span>
+            <span class="n">dense_prompt_embeddings</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dropout</span><span class="p">(</span><span class="n">dense_embeddings</span><span class="p">)</span>
+            <span class="k">if</span> <span class="p">(</span><span class="kc">False</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_dropout</span><span class="p">)</span>
+            <span class="k">else</span> <span class="n">dense_embeddings</span><span class="p">,</span>  <span class="c1"># the embeddings of the mask inputs</span>
+            <span class="n">multimask_output</span><span class="o">=</span><span class="n">multimask_output</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Upscale the masks to the original image resolution</span>
+        <span class="n">masks</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">postprocess_masks</span><span class="p">(</span>
+            <span class="n">low_res_masks</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_size</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">original_size</span>
+        <span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">return_logits</span><span class="p">:</span>
+            <span class="n">masks</span> <span class="o">=</span> <span class="n">masks</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">mask_threshold</span>
+
+        <span class="k">return</span> <span class="n">masks</span><span class="p">,</span> <span class="n">iou_predictions</span><span class="p">,</span> <span class="n">low_res_masks</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Clément Yvernes.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

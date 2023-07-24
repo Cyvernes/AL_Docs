@@ -1,0 +1,7 @@
+Modifications of SAM
+=========================
+
+.. automodule:: SAM_modifications
+   :members:
+   :undoc-members:
+   :show-inheritance:

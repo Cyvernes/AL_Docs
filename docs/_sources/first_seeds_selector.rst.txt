@@ -1,0 +1,7 @@
+First seed selection
+=============================
+
+.. automodule:: first_seeds_selector
+   :members:
+   :undoc-members:
+   :show-inheritance:

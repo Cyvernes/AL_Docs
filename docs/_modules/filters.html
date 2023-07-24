@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>filters &mdash; Active Learning For Connectomics 0.1 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Active Learning For Connectomics
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../modules.html">ActiveLearningForConnectomics</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Active Learning For Connectomics</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Module code</a></li>
+      <li class="breadcrumb-item active">filters</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for filters</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">tools</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">plot_tools</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">import</span> <span class="nn">scipy.ndimage</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TYPE_CHECKING</span>
+<span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">Learners</span> <span class="kn">import</span> <span class="n">ActiveLearningSAM</span>
+
+
+<div class="viewcode-block" id="evidenceSmallerOrEqualToZero"><a class="viewcode-back" href="../filters.html#filters.evidenceSmallerOrEqualToZero">[docs]</a><span class="k">def</span> <span class="nf">evidenceSmallerOrEqualToZero</span><span class="p">(</span><span class="n">learner</span> <span class="p">:</span> <span class="n">ActiveLearningSAM</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;This is an auxiliary function for filtering function. </span>
+<span class="sd">        It computes the region of interest for filtering.</span>
+<span class="sd">        The region of interest is the region of the image in wich the evidence is smaller or equal to zero.</span>
+
+<span class="sd">    :param learner: Learner</span>
+<span class="sd">    :type learner: ActiveLearningSAM</span>
+<span class="sd">    :return: Region of interest</span>
+<span class="sd">    :rtype: np.ndarray</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">blob</span> <span class="o">=</span> <span class="n">learner</span><span class="o">.</span><span class="n">evidence</span> <span class="o">&lt;</span> <span class="mi">0</span>
+    <span class="n">blob</span> <span class="o">=</span> <span class="n">blob</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;uint8&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">blob</span></div>
+
+
+<div class="viewcode-block" id="NotInMasksFromSegmentationStrategy"><a class="viewcode-back" href="../filters.html#filters.NotInMasksFromSegmentationStrategy">[docs]</a><span class="k">def</span> <span class="nf">NotInMasksFromSegmentationStrategy</span><span class="p">(</span><span class="n">learner</span> <span class="p">:</span> <span class="n">ActiveLearningSAM</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;This is an auxiliary function for filtering function. </span>
+<span class="sd">        It computes the region of interest for filtering.</span>
+<span class="sd">        The region of interest is the region that is not segmented by the segmentation strategy</span>
+
+<span class="sd">    :param learner: Learner</span>
+<span class="sd">    :type learner: ActiveLearningSAM</span>
+<span class="sd">    :return: Region of interest</span>
+<span class="sd">    :rtype: np.ndarray</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">blob</span> <span class="o">=</span> <span class="n">learner</span><span class="o">.</span><span class="n">masks_from_single_seeds</span> <span class="o">&lt;=</span> <span class="mi">0</span>
+    <span class="n">blob</span> <span class="o">=</span> <span class="n">blob</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;uint8&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">blob</span></div>
+
+
+<div class="viewcode-block" id="threshOnUncertainty"><a class="viewcode-back" href="../filters.html#filters.threshOnUncertainty">[docs]</a><span class="k">def</span> <span class="nf">threshOnUncertainty</span><span class="p">(</span><span class="n">learner</span> <span class="p">:</span> <span class="n">ActiveLearningSAM</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;This is an auxiliary function for filtering function. </span>
+<span class="sd">        It computes the region of interest in filtering.</span>
+<span class="sd">        The region of interest is defined by thresholds on the uncertainty map.</span>
+
+<span class="sd">    :param learner: Learner</span>
+<span class="sd">    :type learner: ActiveLearningSAM</span>
+<span class="sd">    :return: Region of interest</span>
+<span class="sd">    :rtype: np.ndarray</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">min_p_thresh</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">max_p_thresh</span> <span class="o">=</span> <span class="mf">0.7</span>
+    <span class="n">max_evidence_thresh</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">max_p_thresh</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">max_p_thresh</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">min_p_thresh</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">min_evidence_thresh</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">min_p_thresh</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">min_p_thresh</span><span class="p">))</span>
+    <span class="n">blob</span> <span class="o">=</span> <span class="n">learner</span><span class="o">.</span><span class="n">evidence</span> <span class="o">&lt;</span> <span class="n">max_evidence_thresh</span>
+    <span class="k">if</span> <span class="n">min_p_thresh</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">blob</span><span class="p">[</span><span class="n">learner</span><span class="o">.</span><span class="n">evidence</span> <span class="o">&gt;</span> <span class="n">min_evidence_thresh</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">blob</span> <span class="o">=</span> <span class="n">blob</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;uint8&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">blob</span></div>
+
+
+<div class="viewcode-block" id="filterTrivial"><a class="viewcode-back" href="../filters.html#filters.filterTrivial">[docs]</a><span class="k">def</span> <span class="nf">filterTrivial</span><span class="p">(</span><span class="n">learner</span> <span class="p">:</span> <span class="n">ActiveLearningSAM</span><span class="p">,</span> <span class="n">arr</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;This function is a filter. It changes values in the array arr.</span>
+<span class="sd">        This filter does nothing.</span>
+
+<span class="sd">    :param learner: Learner</span>
+<span class="sd">    :type learner: ActiveLearningSAM</span>
+<span class="sd">    :param arr: Array to be filtered</span>
+<span class="sd">    :type arr: np.ndarray</span>
+<span class="sd">    :return: Filtered array</span>
+<span class="sd">    :rtype: np.ndarray</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">arr</span></div>
+
+
+<div class="viewcode-block" id="hardFilter"><a class="viewcode-back" href="../filters.html#filters.hardFilter">[docs]</a><span class="k">def</span> <span class="nf">hardFilter</span><span class="p">(</span><span class="n">learner</span> <span class="p">:</span> <span class="n">ActiveLearningSAM</span><span class="p">,</span> <span class="n">arr</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;This function is a filter. It changes values in the array arr.</span>
+<span class="sd">       Every values that are not in the region of interest is set to - infinity.</span>
+
+<span class="sd">    :param learner: Learner</span>
+<span class="sd">    :type learner: ActiveLearningSAM</span>
+<span class="sd">    :param arr: Array to be filtered</span>
+<span class="sd">    :type arr: np.ndarray</span>
+<span class="sd">    :return: Filtered array</span>
+<span class="sd">    :rtype: np.ndarray</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">blob</span> <span class="o">=</span> <span class="n">learner</span><span class="o">.</span><span class="n">filtering_aux_function</span><span class="p">(</span><span class="n">learner</span><span class="p">)</span>
+    <span class="n">arr</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">logical_not</span><span class="p">(</span><span class="n">blob</span><span class="p">)]</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span>
+    <span class="k">return</span> <span class="n">arr</span></div>
+
+
+<div class="viewcode-block" id="filterWithDist"><a class="viewcode-back" href="../filters.html#filters.filterWithDist">[docs]</a><span class="k">def</span> <span class="nf">filterWithDist</span><span class="p">(</span><span class="n">learner</span> <span class="p">:</span> <span class="n">ActiveLearningSAM</span><span class="p">,</span> <span class="n">arr</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;This function is a filter. It changes values in the array arr.</span>
+<span class="sd">       Values are changed accoring to the distance from the border of the region of interest.</span>
+<span class="sd">       A sigmoid function is applied so that the filter is continuous.</span>
+
+<span class="sd">    :param learner: Learner</span>
+<span class="sd">    :type learner: ActiveLearningSAM</span>
+<span class="sd">    :param arr: Array to be filtered</span>
+<span class="sd">    :type arr: np.ndarray</span>
+<span class="sd">    :return: Filtered array</span>
+<span class="sd">    :rtype: np.ndarray</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">blob</span> <span class="o">=</span> <span class="n">learner</span><span class="o">.</span><span class="n">filtering_aux_function</span><span class="p">(</span><span class="n">learner</span><span class="p">)</span>
+    <span class="n">dist</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">distanceTransform</span><span class="p">(</span><span class="n">blob</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">DIST_L2</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+    <span class="n">arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">sigmoid</span><span class="p">(</span><span class="n">dist</span> <span class="o">-</span> <span class="mi">10</span><span class="p">))</span>
+    <span class="n">arr</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">logical_not</span><span class="p">(</span><span class="n">blob</span><span class="p">)]</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span>
+    <span class="k">return</span> <span class="n">arr</span></div>
+
+
+<div class="viewcode-block" id="filterWithDistWithBorder"><a class="viewcode-back" href="../filters.html#filters.filterWithDistWithBorder">[docs]</a><span class="k">def</span> <span class="nf">filterWithDistWithBorder</span><span class="p">(</span><span class="n">learner</span> <span class="p">:</span> <span class="n">ActiveLearningSAM</span><span class="p">,</span> <span class="n">arr</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;This function is a filter. It changes values in the array arr.</span>
+<span class="sd">       Values are changed accoring to the distance from the border of the region of interest or from the brder of the image.</span>
+<span class="sd">       A sigmoid function is applied so that the filter is continuous.</span>
+
+<span class="sd">    :param learner: Learner</span>
+<span class="sd">    :type learner: ActiveLearningSAM</span>
+<span class="sd">    :param arr: Array to be filtered</span>
+<span class="sd">    :type arr: np.ndarray</span>
+<span class="sd">    :return: Filtered array</span>
+<span class="sd">    :rtype: np.ndarray</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">blob</span> <span class="o">=</span> <span class="n">learner</span><span class="o">.</span><span class="n">filtering_aux_function</span><span class="p">(</span><span class="n">learner</span><span class="p">)</span>
+    <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="n">blob</span><span class="o">.</span><span class="n">shape</span>
+    <span class="n">cv2</span><span class="o">.</span><span class="n">rectangle</span><span class="p">(</span><span class="n">blob</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="n">a</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">b</span> <span class="o">-</span> <span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">dist</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">distanceTransform</span><span class="p">(</span><span class="n">blob</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">DIST_L2</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+    <span class="n">arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">sigmoid</span><span class="p">(</span><span class="n">dist</span> <span class="o">-</span> <span class="mi">10</span><span class="p">))</span>
+    <span class="n">arr</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">logical_not</span><span class="p">(</span><span class="n">blob</span><span class="p">)]</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span>
+    <span class="k">return</span> <span class="n">arr</span></div>
+
+
+<div class="viewcode-block" id="filterWithPercentile"><a class="viewcode-back" href="../filters.html#filters.filterWithPercentile">[docs]</a><span class="k">def</span> <span class="nf">filterWithPercentile</span><span class="p">(</span><span class="n">learner</span> <span class="p">:</span> <span class="n">ActiveLearningSAM</span><span class="p">,</span> <span class="n">arr</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;This function is a filter. It changes values in the array arr.</span>
+<span class="sd">       Values greater than the 80th percentile are set to 0</span>
+
+<span class="sd">    :param learner: Learner</span>
+<span class="sd">    :type learner: ActiveLearningSAM</span>
+<span class="sd">    :param arr: Array to be filtered</span>
+<span class="sd">    :type arr: np.ndarray</span>
+<span class="sd">    :return: Filtered array</span>
+<span class="sd">    :rtype: np.ndarray</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">percentile_thresh</span> <span class="o">=</span> <span class="mi">80</span>
+    <span class="n">arr</span><span class="p">[</span><span class="n">arr</span> <span class="o">&gt;=</span> <span class="n">np</span><span class="o">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">percentile_thresh</span><span class="p">)]</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">return</span> <span class="n">arr</span></div>
+
+
+<div class="viewcode-block" id="filterWithDistSkeleton"><a class="viewcode-back" href="../filters.html#filters.filterWithDistSkeleton">[docs]</a><span class="k">def</span> <span class="nf">filterWithDistSkeleton</span><span class="p">(</span><span class="n">learner</span> <span class="p">:</span> <span class="n">ActiveLearningSAM</span><span class="p">,</span> <span class="n">arr</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;This function is a filter. It changes values in the array arr.</span>
+<span class="sd">       Values are changed accoring to the skeleton of the distance from the border</span>
+
+<span class="sd">    :param learner: Learner</span>
+<span class="sd">    :type learner: ActiveLearningSAM</span>
+<span class="sd">    :param arr: Array to be filtered</span>
+<span class="sd">    :type arr: np.ndarray</span>
+<span class="sd">    :return: Filtered array</span>
+<span class="sd">    :rtype: np.ndarray</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">evidence</span> <span class="o">=</span> <span class="n">learner</span><span class="o">.</span><span class="n">evidence</span>
+    <span class="n">p_thresh</span> <span class="o">=</span> <span class="mf">0.95</span>
+    <span class="n">evidence_thresh</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">p_thresh</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">p_thresh</span><span class="p">))</span>
+    <span class="n">skeleton_mask</span> <span class="o">=</span> <span class="n">skeleton</span><span class="p">(</span><span class="n">evidence</span> <span class="o">&lt;</span> <span class="n">evidence_thresh</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="n">skeleton_mask</span><span class="p">,</span> <span class="n">arr</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="filterGaussianDistFromKnownSeeds"><a class="viewcode-back" href="../filters.html#filters.filterGaussianDistFromKnownSeeds">[docs]</a><span class="k">def</span> <span class="nf">filterGaussianDistFromKnownSeeds</span><span class="p">(</span><span class="n">learner</span> <span class="p">:</span> <span class="n">ActiveLearningSAM</span><span class="p">,</span> <span class="n">arr</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;This function is a filter. It changes values in the array arr.</span>
+<span class="sd">       Values are changed accoring to the gaussian distance from the already annotated points.</span>
+
+<span class="sd">    :param learner: Learner</span>
+<span class="sd">    :type learner: ActiveLearningSAM</span>
+<span class="sd">    :param arr: Array to be filtered</span>
+<span class="sd">    :type arr: np.ndarray</span>
+<span class="sd">    :return: Filtered array</span>
+<span class="sd">    :rtype: np.ndarray</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">filter_arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span>
+    <span class="n">x_coords</span><span class="p">,</span> <span class="n">y_coords</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">learner</span><span class="o">.</span><span class="n">input_points</span><span class="p">)</span>
+    <span class="n">filter_arr</span><span class="p">[</span><span class="n">y_coords</span><span class="p">,</span> <span class="n">x_coords</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">filter_arr</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">ndimage</span><span class="o">.</span><span class="n">gaussian_filter</span><span class="p">(</span><span class="n">filter_arr</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+    <span class="n">maxx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">filter_arr</span><span class="p">)</span>
+    <span class="n">filter_arr</span> <span class="o">=</span> <span class="n">filter_arr</span> <span class="o">/</span> <span class="n">maxx</span> <span class="k">if</span> <span class="n">maxx</span> <span class="o">!=</span> <span class="mi">0</span> <span class="k">else</span> <span class="n">filter_arr</span>
+    <span class="n">arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">filter_arr</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">arr</span></div>
+
+
+<div class="viewcode-block" id="filterDistFromKnownSeeds"><a class="viewcode-back" href="../filters.html#filters.filterDistFromKnownSeeds">[docs]</a><span class="k">def</span> <span class="nf">filterDistFromKnownSeeds</span><span class="p">(</span><span class="n">learner</span> <span class="p">:</span> <span class="n">ActiveLearningSAM</span><span class="p">,</span> <span class="n">arr</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;This function is a filter. It changes values in the array arr.</span>
+<span class="sd">       Values are changed accoring to the distance from already annotated points.</span>
+
+<span class="sd">    :param learner: Learner</span>
+<span class="sd">    :type learner: ActiveLearningSAM</span>
+<span class="sd">    :param arr: Array to be filtered</span>
+<span class="sd">    :type arr: np.ndarray</span>
+<span class="sd">    :return: Filtered array</span>
+<span class="sd">    :rtype: np.ndarray</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">blob</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span>
+    <span class="n">x_coords</span><span class="p">,</span> <span class="n">y_coords</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">learner</span><span class="o">.</span><span class="n">input_points</span><span class="p">)</span>
+    <span class="n">blob</span><span class="p">[</span><span class="n">y_coords</span><span class="p">,</span> <span class="n">x_coords</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">dist</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">distanceTransform</span><span class="p">(</span><span class="n">blob</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;uint8&quot;</span><span class="p">),</span> <span class="n">cv2</span><span class="o">.</span><span class="n">DIST_L2</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+    <span class="n">arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">sigmoid</span><span class="p">(</span><span class="n">dist</span> <span class="o">-</span> <span class="mi">30</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">arr</span></div>
+
+
+<div class="viewcode-block" id="HybridGDFKS_hard"><a class="viewcode-back" href="../filters.html#filters.HybridGDFKS_hard">[docs]</a><span class="k">def</span> <span class="nf">HybridGDFKS_hard</span><span class="p">(</span><span class="n">learner</span> <span class="p">:</span> <span class="n">ActiveLearningSAM</span><span class="p">,</span> <span class="n">arr</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;This function is a filter. It changes values in the array arr.</span>
+<span class="sd">       This is an hybrid filter. It calls filterGaussianDistFromKnownSeeds and hardFilter.</span>
+
+<span class="sd">    :param learner: Learner</span>
+<span class="sd">    :type learner: ActiveLearningSAM</span>
+<span class="sd">    :param arr: Array to be filtered</span>
+<span class="sd">    :type arr: np.ndarray</span>
+<span class="sd">    :return: Filtered array</span>
+<span class="sd">    :rtype: np.ndarray</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">arr</span> <span class="o">=</span> <span class="n">filterGaussianDistFromKnownSeeds</span><span class="p">(</span><span class="n">learner</span><span class="p">,</span> <span class="n">arr</span><span class="p">)</span>
+    <span class="n">arr</span> <span class="o">=</span> <span class="n">hardFilter</span><span class="p">(</span><span class="n">learner</span><span class="p">,</span> <span class="n">arr</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">arr</span></div>
+
+
+<div class="viewcode-block" id="HybridDFKS_hard"><a class="viewcode-back" href="../filters.html#filters.HybridDFKS_hard">[docs]</a><span class="k">def</span> <span class="nf">HybridDFKS_hard</span><span class="p">(</span><span class="n">learner</span> <span class="p">:</span> <span class="n">ActiveLearningSAM</span><span class="p">,</span> <span class="n">arr</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;This function is a filter. It changes values in the array arr.</span>
+<span class="sd">       This is an hybrid filter. It calls filterDistFromKnownSeeds and hardFilter.</span>
+
+<span class="sd">    :param learner: Learner</span>
+<span class="sd">    :type learner: ActiveLearningSAM</span>
+<span class="sd">    :param arr: Array to be filtered</span>
+<span class="sd">    :type arr: np.ndarray</span>
+<span class="sd">    :return: Filtered array</span>
+<span class="sd">    :rtype: np.ndarray</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">arr</span> <span class="o">=</span> <span class="n">filterDistFromKnownSeeds</span><span class="p">(</span><span class="n">learner</span><span class="p">,</span> <span class="n">arr</span><span class="p">)</span>
+    <span class="n">arr</span> <span class="o">=</span> <span class="n">hardFilter</span><span class="p">(</span><span class="n">learner</span><span class="p">,</span> <span class="n">arr</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">arr</span></div>
+
+
+<div class="viewcode-block" id="HybridGDFKS_Dist"><a class="viewcode-back" href="../filters.html#filters.HybridGDFKS_Dist">[docs]</a><span class="k">def</span> <span class="nf">HybridGDFKS_Dist</span><span class="p">(</span><span class="n">learner</span> <span class="p">:</span> <span class="n">ActiveLearningSAM</span><span class="p">,</span> <span class="n">arr</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;This function is a filter. It changes values in the array arr.</span>
+<span class="sd">       This is an hybrid filter. It calls filterGaussianDistFromKnownSeeds and filterWithDist.</span>
+
+<span class="sd">    :param learner: Learner</span>
+<span class="sd">    :type learner: ActiveLearningSAM</span>
+<span class="sd">    :param arr: Array to be filtered</span>
+<span class="sd">    :type arr: np.ndarray</span>
+<span class="sd">    :return: Filtered array</span>
+<span class="sd">    :rtype: np.ndarray</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">arr</span> <span class="o">=</span> <span class="n">filterGaussianDistFromKnownSeeds</span><span class="p">(</span><span class="n">learner</span><span class="p">,</span> <span class="n">arr</span><span class="p">)</span>
+    <span class="n">arr</span> <span class="o">=</span> <span class="n">filterWithDist</span><span class="p">(</span><span class="n">learner</span><span class="p">,</span> <span class="n">arr</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">arr</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Clément Yvernes.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

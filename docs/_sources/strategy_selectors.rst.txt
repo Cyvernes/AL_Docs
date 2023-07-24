@@ -1,0 +1,7 @@
+Strategy selectors
+==========================
+
+.. automodule:: strategy_selectors
+   :members:
+   :undoc-members:
+   :show-inheritance:

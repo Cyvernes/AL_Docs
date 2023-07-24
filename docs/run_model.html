@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>run_model module &mdash; Active Learning For Connectomics 0.1 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Strategy selectors" href="strategy_selectors.html" />
+    <link rel="prev" title="Plot tools" href="plot_tools.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Active Learning For Connectomics
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">ActiveLearningForConnectomics</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="AL_SAM.html">AL_SAM module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Learners.html">Learners</a></li>
+<li class="toctree-l2"><a class="reference internal" href="SAM_modifications.html">Modifications of SAM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_tools.html">Data tools</a></li>
+<li class="toctree-l2"><a class="reference internal" href="filters.html">Filters</a></li>
+<li class="toctree-l2"><a class="reference internal" href="first_seeds_selector.html">First seed selection</a></li>
+<li class="toctree-l2"><a class="reference internal" href="learning_strategies.html">Learning strategies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="next_seeds_strategies.html">Sampling strategies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot_tools.html">Plot tools</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">run_model module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#run_model.check_environment"><code class="docutils literal notranslate"><span class="pre">check_environment()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#run_model.find_first_seeds"><code class="docutils literal notranslate"><span class="pre">find_first_seeds()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#run_model.load_config"><code class="docutils literal notranslate"><span class="pre">load_config()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#run_model.load_sam"><code class="docutils literal notranslate"><span class="pre">load_sam()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#run_model.plots_for_single_image"><code class="docutils literal notranslate"><span class="pre">plots_for_single_image()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#run_model.run_learning_process"><code class="docutils literal notranslate"><span class="pre">run_learning_process()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#run_model.run_model_dataset"><code class="docutils literal notranslate"><span class="pre">run_model_dataset()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#run_model.run_model_single_image"><code class="docutils literal notranslate"><span class="pre">run_model_single_image()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#run_model.setup_learner"><code class="docutils literal notranslate"><span class="pre">setup_learner()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="strategy_selectors.html">Strategy selectors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tools.html">Tools</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Active Learning For Connectomics</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">ActiveLearningForConnectomics</a></li>
+      <li class="breadcrumb-item active">run_model module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/run_model.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-run_model">
+<span id="run-model-module"></span><h1>run_model module<a class="headerlink" href="#module-run_model" title="Permalink to this heading"></a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="run_model.check_environment">
+<span class="sig-prename descclassname"><span class="pre">run_model.</span></span><span class="sig-name descname"><span class="pre">check_environment</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/run_model.html#check_environment"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#run_model.check_environment" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="run_model.find_first_seeds">
+<span class="sig-prename descclassname"><span class="pre">run_model.</span></span><span class="sig-name descname"><span class="pre">find_first_seeds</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">learner</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">GT_mask</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">idx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/run_model.html#find_first_seeds"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#run_model.find_first_seeds" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="run_model.load_config">
+<span class="sig-prename descclassname"><span class="pre">run_model.</span></span><span class="sig-name descname"><span class="pre">load_config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">base_json_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">setting_json_file</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/run_model.html#load_config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#run_model.load_config" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="run_model.load_sam">
+<span class="sig-prename descclassname"><span class="pre">run_model.</span></span><span class="sig-name descname"><span class="pre">load_sam</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/run_model.html#load_sam"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#run_model.load_sam" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="run_model.plots_for_single_image">
+<span class="sig-prename descclassname"><span class="pre">run_model.</span></span><span class="sig-name descname"><span class="pre">plots_for_single_image</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">NBs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">IoUs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">FPs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">FNs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">percentiles</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">idx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/run_model.html#plots_for_single_image"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#run_model.plots_for_single_image" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="run_model.run_learning_process">
+<span class="sig-prename descclassname"><span class="pre">run_model.</span></span><span class="sig-name descname"><span class="pre">run_learning_process</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">learner</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">GT_mask</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">first_seeds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nb_seeds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">idx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/run_model.html#run_learning_process"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#run_model.run_learning_process" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="run_model.run_model_dataset">
+<span class="sig-prename descclassname"><span class="pre">run_model.</span></span><span class="sig-name descname"><span class="pre">run_model_dataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">learner</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">images_links</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">masks_links</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/run_model.html#run_model_dataset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#run_model.run_model_dataset" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="run_model.run_model_single_image">
+<span class="sig-prename descclassname"><span class="pre">run_model.</span></span><span class="sig-name descname"><span class="pre">run_model_single_image</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">learner</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_link</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask_link</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">idx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aggregated_results</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/run_model.html#run_model_single_image"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#run_model.run_model_single_image" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="run_model.setup_learner">
+<span class="sig-prename descclassname"><span class="pre">run_model.</span></span><span class="sig-name descname"><span class="pre">setup_learner</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sam</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/run_model.html#setup_learner"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#run_model.setup_learner" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="plot_tools.html" class="btn btn-neutral float-left" title="Plot tools" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="strategy_selectors.html" class="btn btn-neutral float-right" title="Strategy selectors" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Clément Yvernes.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

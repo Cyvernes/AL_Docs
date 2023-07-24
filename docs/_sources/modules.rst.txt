@@ -1,0 +1,18 @@
+ActiveLearningForConnectomics
+=============================
+
+.. toctree::
+   :maxdepth: 4
+
+   AL_SAM
+   Learners
+   SAM_modifications
+   data_tools
+   filters
+   first_seeds_selector
+   learning_strategies
+   next_seeds_strategies
+   plot_tools
+   run_model
+   strategy_selectors
+   tools

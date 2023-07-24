@@ -1,0 +1,7 @@
+Learning strategies
+===========================
+
+.. automodule:: learning_strategies
+   :members:
+   :undoc-members:
+   :show-inheritance:

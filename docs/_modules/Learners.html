@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Learners &mdash; Active Learning For Connectomics 0.1 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Active Learning For Connectomics
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../modules.html">ActiveLearningForConnectomics</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Active Learning For Connectomics</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Module code</a></li>
+      <li class="breadcrumb-item active">Learners</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for Learners</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">import</span> <span class="nn">torchvision</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">cv2</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">segment_anything</span> <span class="kn">import</span> <span class="n">sam_model_registry</span><span class="p">,</span> <span class="n">SamAutomaticMaskGenerator</span><span class="p">,</span> <span class="n">SamPredictor</span>
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">from</span> <span class="nn">tools</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">plot_tools</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">filters</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">strategy_selectors</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">next_seeds_strategies</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">SAM_modifications</span> <span class="kn">import</span> <span class="n">SamPredictorWithDropOut</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span>
+
+
+<div class="viewcode-block" id="ActiveLearningSAM"><a class="viewcode-back" href="../Learners.html#Learners.ActiveLearningSAM">[docs]</a><span class="k">class</span> <span class="nc">ActiveLearningSAM</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;This is the basic class for the active Learning for Connectomics project.</span>
+<span class="sd">    This class can&#39;t access Ground Truth</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">model</span><span class="p">,</span>
+        <span class="n">strategy_selector</span><span class="p">,</span>
+        <span class="n">learning_strategies</span><span class="p">,</span>
+        <span class="n">first_seeds_selector</span><span class="p">,</span>
+        <span class="n">seeds_selection_strategies</span><span class="p">,</span>
+        <span class="n">uncertainty_fn</span><span class="p">,</span>
+        <span class="n">filtering_fn</span><span class="p">,</span>
+        <span class="n">filtering_aux_fn</span><span class="p">,</span>
+        <span class="n">image</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">mask_generator</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">use_previous_logits</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Constructor of the ActiveLearningSAM class</span>
+
+<span class="sd">        :param model: Model used in segmentation (usually it&#39;s SAM)</span>
+<span class="sd">        :type model: _type_</span>
+<span class="sd">        :param strategy_selector: Function that selects wich strategy will be used</span>
+<span class="sd">        :type strategy_selector: _type_</span>
+<span class="sd">        :param learning_strategies: Every learning strategies that will be used during the experiment</span>
+<span class="sd">        :type learning_strategies: _type_</span>
+<span class="sd">        :param first_seeds_selector: Function that selects the first points to annotate</span>
+<span class="sd">        :type first_seeds_selector: _type_</span>
+<span class="sd">        :param seeds_selection_strategies: Sampling strategies that will be used during the experiment</span>
+<span class="sd">        :type seeds_selection_strategies: _type_</span>
+<span class="sd">        :param uncertainty_fn: Function that computes the uncertainty map from the evidence map</span>
+<span class="sd">        :type uncertainty_fn: _type_</span>
+<span class="sd">        :param filtering_fn: Function used as a filter during sampling of the next seeds</span>
+<span class="sd">        :type filtering_fn: _type_</span>
+<span class="sd">        :param filtering_aux_fn: Auxiliary function that computes the region of interest for the filter</span>
+<span class="sd">        :type filtering_aux_fn: _type_</span>
+<span class="sd">        :param image: Image to segment, defaults to None</span>
+<span class="sd">        :type image: _type_, optional</span>
+<span class="sd">        :param mask_generator: Automatic mask generator, defaults to None</span>
+<span class="sd">        :type mask_generator: _type_, optional</span>
+<span class="sd">        :param use_previous_logits: _description_, defaults to True</span>
+<span class="sd">        :type use_previous_logits: Parameter for the predictor. If set to true the predictor will use previous prediction during prediction, optional</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">model</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">image</span> <span class="o">=</span> <span class="n">image</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cp_mask</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># Current predicted mask</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">need_ground_truth</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">use_previous_logits</span> <span class="o">=</span> <span class="n">use_previous_logits</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">input_points</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">seed_subsets</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># Used by FewSeedsForOneMask</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">label_subsets</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># Used by FewSeedsForOneMask</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">input_labels</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">evidence</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_strategy_idx</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logits</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">a_priori</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_strategy_idx</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">masks_from_single_seeds</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">idx_when_strat_has_changed</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nb_seed_used</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nb_initial_seeds</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">first_seeds_selector</span> <span class="o">=</span> <span class="n">first_seeds_selector</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">uncertainty_function</span> <span class="o">=</span> <span class="n">uncertainty_fn</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">filtering_function</span> <span class="o">=</span> <span class="n">filtering_fn</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">filtering_aux_function</span> <span class="o">=</span> <span class="n">filtering_aux_fn</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">strategy_selector</span> <span class="o">=</span> <span class="n">strategy_selector</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">seeds_selection_strategies</span> <span class="o">=</span> <span class="n">seeds_selection_strategies</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">count</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># debug</span>
+        <span class="c1"># Instancing a mask generator</span>
+        <span class="k">if</span> <span class="n">mask_generator</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mask_generator</span> <span class="o">=</span> <span class="n">mask_generator</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mask_generator</span> <span class="o">=</span> <span class="n">SamAutomaticMaskGenerator</span><span class="p">(</span>
+                <span class="n">model</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span>
+                <span class="n">points_per_side</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span>
+                <span class="n">points_per_batch</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span>
+                <span class="n">pred_iou_thresh</span><span class="o">=</span><span class="mf">0.95</span><span class="p">,</span>
+                <span class="n">stability_score_thresh</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span>
+                <span class="n">crop_n_layers</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                <span class="n">crop_n_points_downscale_factor</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+                <span class="n">min_mask_region_area</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>  <span class="c1"># Requires open-cv to run post-processing</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Instancing a predictor</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">predictor</span> <span class="o">=</span> <span class="n">SamPredictorWithDropOut</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">use_dropout</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">learning_strategies</span> <span class="o">=</span> <span class="p">[</span><span class="n">ls</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="k">for</span> <span class="n">ls</span> <span class="ow">in</span> <span class="n">learning_strategies</span><span class="p">]</span>
+
+<div class="viewcode-block" id="ActiveLearningSAM.setData"><a class="viewcode-back" href="../Learners.html#Learners.ActiveLearningSAM.setData">[docs]</a>    <span class="k">def</span> <span class="nf">setData</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">image</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Load the image into the learner</span>
+<span class="sd">        Many attributes are reinitialised</span>
+<span class="sd">        :param image: Image to segment</span>
+<span class="sd">        :type image: np.ndarray</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">image</span> <span class="o">=</span> <span class="n">image</span>
+        <span class="n">h</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">image</span><span class="o">.</span><span class="n">shape</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">evidence</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">h</span><span class="p">,</span> <span class="n">w</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;float32&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">predictor</span><span class="o">.</span><span class="n">set_image</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cp_mask</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_strategy_idx</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="n">evidence</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">predictor</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span>
+            <span class="n">point_coords</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">point_labels</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">mask_input</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">multimask_output</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">return_logits</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">a_priori</span> <span class="o">=</span> <span class="n">evidence</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">masks_from_single_seeds</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">a_priori</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;int16&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nb_initial_seeds</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span></div>
+
+<div class="viewcode-block" id="ActiveLearningSAM.findFirstSeeds"><a class="viewcode-back" href="../Learners.html#Learners.ActiveLearningSAM.findFirstSeeds">[docs]</a>    <span class="k">def</span> <span class="nf">findFirstSeeds</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]],</span> <span class="nb">int</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;This method computes the first points to annotate.</span>
+
+<span class="sd">        :return: This method returns the list of first seeds to annotate and the number of seeds in SE_seeds</span>
+<span class="sd">        :rtype: Tuple[List[Tuple[int, int]], int]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">SE_masks</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mask_generator</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">image</span><span class="p">),</span>
+            <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">mask</span><span class="p">:</span> <span class="n">mask</span><span class="p">[</span><span class="s2">&quot;predicted_iou&quot;</span><span class="p">],</span>
+        <span class="p">)</span>  <span class="c1"># masks from Segment Everything are in the same format as the image</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">SE_Seeds</span> <span class="o">=</span> <span class="n">removeTooCloseSeeds</span><span class="p">(</span>
+            <span class="p">[</span><span class="n">swap</span><span class="p">(</span><span class="n">findVisualCenter</span><span class="p">(</span><span class="n">mask</span><span class="p">[</span><span class="s2">&quot;segmentation&quot;</span><span class="p">]))</span> <span class="k">for</span> <span class="n">mask</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">SE_masks</span><span class="p">]</span>
+        <span class="p">)</span>  <span class="c1"># SE_seeds are saved in the input format</span>
+        <span class="n">nb_seeds</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">SE_Seeds</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nb_initial_seeds</span> <span class="o">=</span> <span class="n">nb_seeds</span>
+        <span class="n">first_seeds</span><span class="p">,</span> <span class="n">SE_mask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">first_seeds_selector</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cp_mask</span> <span class="o">=</span> <span class="n">SE_mask</span>
+        <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">SE_masks</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">first_seeds</span><span class="p">,</span> <span class="n">nb_seeds</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ActiveLearningSAM.learn"><a class="viewcode-back" href="../Learners.html#Learners.ActiveLearningSAM.learn">[docs]</a>    <span class="k">def</span> <span class="nf">learn</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_points</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">input_labels</span><span class="p">:</span> <span class="nb">list</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Implements an iteration of active learning</span>
+<span class="sd">        New seeds are used to improve the segmentation.</span>
+<span class="sd">        The evidence and uncertainty map are updated</span>
+
+<span class="sd">        :param input_points: Input seeds</span>
+<span class="sd">        :type input_points: list</span>
+<span class="sd">        :param input_labels: Labels corresponding to input seeds</span>
+<span class="sd">        :type input_labels: list</span>
+<span class="sd">        :return: Current predicted mask</span>
+<span class="sd">        :rtype: np.ndarray</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">input_points</span> <span class="o">=</span> <span class="n">input_points</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">input_labels</span> <span class="o">=</span> <span class="n">input_labels</span>
+        <span class="n">old_strat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_strategy_idx</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_strategy_idx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">strategy_selector</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">old_strat</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_strategy_idx</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">idx_when_strat_has_changed</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">input_points</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">learning_strategies</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">current_strategy_idx</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">learning_strategies</span><span class="p">)]()</span>  <span class="c1"># apply the learning strategy</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nb_seed_used</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">input_points</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">cp_mask</span></div>
+
+<div class="viewcode-block" id="ActiveLearningSAM.findNextSeeds"><a class="viewcode-back" href="../Learners.html#Learners.ActiveLearningSAM.findNextSeeds">[docs]</a>    <span class="k">def</span> <span class="nf">findNextSeeds</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Uses the evidence map and the uncertainty map to sample the next seed to annotate.</span>
+
+<span class="sd">        :return: Next seeds to annotate</span>
+<span class="sd">        :rtype: list</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_strategy_idx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">strategy_selector</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">old_strat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_strategy_idx</span>
+        <span class="k">if</span> <span class="n">old_strat</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_strategy_idx</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">idx_when_strat_has_changed</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">input_points</span><span class="p">))</span>
+        <span class="n">next_seeds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">seeds_selection_strategies</span><span class="p">[</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">current_strategy_idx</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">seeds_selection_strategies</span><span class="p">)</span>
+        <span class="p">](</span><span class="bp">self</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">next_seeds</span></div></div>
+
+
+<div class="viewcode-block" id="FPFNLearner"><a class="viewcode-back" href="../Learners.html#Learners.FPFNLearner">[docs]</a><span class="k">class</span> <span class="nc">FPFNLearner</span><span class="p">(</span><span class="n">ActiveLearningSAM</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;This class is not an active learner. Seeds are selected accoring to the most arrorous point.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">model</span><span class="p">,</span>
+        <span class="n">strategy_selector</span><span class="p">,</span>
+        <span class="n">learning_strategies</span><span class="p">,</span>
+        <span class="n">seeds_selection_strategies</span><span class="p">,</span>
+        <span class="n">uncertainty_fn</span><span class="p">,</span>
+        <span class="n">filtering_fn</span><span class="p">,</span>
+        <span class="n">filtering_aux_fn</span><span class="p">,</span>
+        <span class="n">image</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">mask_generator</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">use_previous_logits</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Constructor of the FPFNLearner class</span>
+
+<span class="sd">        :param model: Model used in segmentation (usually it&#39;s SAM)</span>
+<span class="sd">        :type model: _type_</span>
+<span class="sd">        :param strategy_selector: Function that selects wich strategy will be used</span>
+<span class="sd">        :type strategy_selector: _type_</span>
+<span class="sd">        :param learning_strategies: Every learning strategies that will be used during the experiment</span>
+<span class="sd">        :type learning_strategies: _type_</span>
+<span class="sd">        :param first_seeds_selector: Function that selects the first points to annotate</span>
+<span class="sd">        :type first_seeds_selector: _type_</span>
+<span class="sd">        :param seeds_selection_strategies: Sampling strategies that will be used during the experiment</span>
+<span class="sd">        :type seeds_selection_strategies: _type_</span>
+<span class="sd">        :param uncertainty_fn: Function that computes the uncertainty map from the evidence map</span>
+<span class="sd">        :type uncertainty_fn: _type_</span>
+<span class="sd">        :param filtering_fn: Function used as a filter during sampling of the next seeds</span>
+<span class="sd">        :type filtering_fn: _type_</span>
+<span class="sd">        :param filtering_aux_fn: Auxiliary function that computes the region of interest for the filter</span>
+<span class="sd">        :type filtering_aux_fn: _type_</span>
+<span class="sd">        :param image: Image to segment, defaults to None</span>
+<span class="sd">        :type image: _type_, optional</span>
+<span class="sd">        :param mask_generator: Automatic mask generator, defaults to None</span>
+<span class="sd">        :type mask_generator: _type_, optional</span>
+<span class="sd">        :param use_previous_logits: Parameter for the predictor. If set to true the predictor will use previous prediction during prediction, defaults to True</span>
+<span class="sd">        :type use_previous_logits: bool, optional</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">model</span><span class="p">,</span>
+            <span class="n">strategy_selector</span><span class="p">,</span>
+            <span class="n">learning_strategies</span><span class="p">,</span>
+            <span class="n">seeds_selection_strategies</span><span class="p">,</span>
+            <span class="n">uncertainty_fn</span><span class="p">,</span>
+            <span class="n">filtering_fn</span><span class="p">,</span>
+            <span class="n">filtering_aux_fn</span><span class="p">,</span>
+            <span class="n">image</span><span class="p">,</span>
+            <span class="n">mask_generator</span><span class="p">,</span>
+            <span class="n">use_previous_logits</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">GT_mask</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">need_ground_truth</span> <span class="o">=</span> <span class="kc">True</span>
+    
+<div class="viewcode-block" id="FPFNLearner.setGroundTruthMask"><a class="viewcode-back" href="../Learners.html#Learners.FPFNLearner.setGroundTruthMask">[docs]</a>    <span class="k">def</span> <span class="nf">setGroundTruthMask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mask</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Sets the ground truth mask</span>
+
+<span class="sd">        :param mask: Ground truth mask</span>
+<span class="sd">        :type mask: np.ndarray</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">GT_mask</span> <span class="o">=</span> <span class="n">mask</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;uint8&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="FPFNLearner.findNextSeeds"><a class="viewcode-back" href="../Learners.html#Learners.FPFNLearner.findNextSeeds">[docs]</a>    <span class="k">def</span> <span class="nf">findNextSeeds</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Samples next seed using the false positive pixels and the false negative pixels.</span>
+
+<span class="sd">        :return: Next seed to annotate (in a list)</span>
+<span class="sd">        :rtype: list</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">error</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">bitwise_xor</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">GT_mask</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cp_mask</span><span class="p">)</span>
+        <span class="n">new_seed</span> <span class="o">=</span> <span class="n">swap</span><span class="p">(</span><span class="n">findVisualCenter</span><span class="p">(</span><span class="n">error</span><span class="p">))</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">new_seed</span><span class="p">]</span></div></div>
+ 
+
+<div class="viewcode-block" id="RandomLearner"><a class="viewcode-back" href="../Learners.html#Learners.RandomLearner">[docs]</a><span class="k">class</span> <span class="nc">RandomLearner</span><span class="p">(</span><span class="n">ActiveLearningSAM</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;This class is not an active learner, next seeds are chosen at random</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">model</span><span class="p">,</span>
+        <span class="n">strategy_selector</span><span class="p">,</span>
+        <span class="n">learning_strategies</span><span class="p">,</span>
+        <span class="n">seeds_selection_strategies</span><span class="p">,</span>
+        <span class="n">uncertainty_fn</span><span class="p">,</span>
+        <span class="n">filtering_fn</span><span class="p">,</span>
+        <span class="n">filtering_aux_fn</span><span class="p">,</span>
+        <span class="n">image</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">mask_generator</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">use_previous_logits</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">):</span> 
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Constructor of the RandomLearner class</span>
+<span class="sd">        Sampling is done at random</span>
+
+<span class="sd">        :param model: Model used in segmentation (usually it&#39;s SAM)</span>
+<span class="sd">        :type model: _type_</span>
+<span class="sd">        :param strategy_selector: Function that selects wich strategy will be used</span>
+<span class="sd">        :type strategy_selector: _type_</span>
+<span class="sd">        :param learning_strategies: Every learning strategies that will be used during the experiment</span>
+<span class="sd">        :type learning_strategies: _type_</span>
+<span class="sd">        :param first_seeds_selector: Function that selects the first points to annotate</span>
+<span class="sd">        :type first_seeds_selector: _type_</span>
+<span class="sd">        :param seeds_selection_strategies: Sampling strategies that will be used during the experiment</span>
+<span class="sd">        :type seeds_selection_strategies: _type_</span>
+<span class="sd">        :param uncertainty_fn: Function that computes the uncertainty map from the evidence map</span>
+<span class="sd">        :type uncertainty_fn: _type_</span>
+<span class="sd">        :param filtering_fn: Function used as a filter during sampling of the next seeds</span>
+<span class="sd">        :type filtering_fn: _type_</span>
+<span class="sd">        :param filtering_aux_fn: Auxiliary function that computes the region of interest for the filter</span>
+<span class="sd">        :type filtering_aux_fn: _type_</span>
+<span class="sd">        :param image: Image to segment, defaults to None</span>
+<span class="sd">        :type image: _type_, optional</span>
+<span class="sd">        :param mask_generator: Automatic mask generator, defaults to None</span>
+<span class="sd">        :type mask_generator: _type_, optional</span>
+<span class="sd">        :param use_previous_logits: Parameter for the predictor. If set to true the predictor will use previous prediction during prediction, defaults to True</span>
+<span class="sd">        :type use_previous_logits: bool, optional</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">model</span><span class="p">,</span>
+            <span class="n">strategy_selector</span><span class="p">,</span>
+            <span class="n">learning_strategies</span><span class="p">,</span>
+            <span class="n">seeds_selection_strategies</span><span class="p">,</span>
+            <span class="n">uncertainty_fn</span><span class="p">,</span>
+            <span class="n">filtering_fn</span><span class="p">,</span>
+            <span class="n">filtering_aux_fn</span><span class="p">,</span>
+            <span class="n">image</span><span class="p">,</span>
+            <span class="n">mask_generator</span><span class="p">,</span>
+            <span class="n">use_previous_logits</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># select seed for pseudo random generator</span>
+
+<div class="viewcode-block" id="RandomLearner.findNextSeeds"><a class="viewcode-back" href="../Learners.html#Learners.RandomLearner.findNextSeeds">[docs]</a>    <span class="k">def</span> <span class="nf">findNextSeeds</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Samples next seed using the false positive pixels and the false negative pixels.</span>
+
+<span class="sd">        :return: Next seed to annotate (in a list)</span>
+<span class="sd">        :rtype: list</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">h</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">shape</span>
+        <span class="n">new_seed</span> <span class="o">=</span> <span class="p">[</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">h</span> <span class="o">-</span> <span class="mi">1</span><span class="p">),</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">w</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)]</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">new_seed</span><span class="p">]</span></div></div>
+
+
+<div class="viewcode-block" id="PseudoActiveLearningSAM"><a class="viewcode-back" href="../Learners.html#Learners.PseudoActiveLearningSAM">[docs]</a><span class="k">class</span> <span class="nc">PseudoActiveLearningSAM</span><span class="p">(</span><span class="n">ActiveLearningSAM</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;This class is an active Learner but it can acces ground truth. </span>
+<span class="sd">    This allows to simulate specific settings that need to use the ground truth.</span>
+<span class="sd">    For instance, giving all foreground points at the beginning can only be done in this class.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">model</span><span class="p">,</span>
+        <span class="n">strategy_selector</span><span class="p">,</span>
+        <span class="n">learning_strategies</span><span class="p">,</span>
+        <span class="n">first_seeds_selector</span><span class="p">,</span>
+        <span class="n">seeds_selection_strategies</span><span class="p">,</span>
+        <span class="n">uncertainty_fn</span><span class="p">,</span>
+        <span class="n">filtering_fn</span><span class="p">,</span>
+        <span class="n">filtering_aux_fn</span><span class="p">,</span>
+        <span class="n">image</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">mask_generator</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">use_previous_logits</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Constructor of the ActiveLearningSAM class</span>
+
+<span class="sd">        :param model: Model used in segmentation (usually it&#39;s SAM)</span>
+<span class="sd">        :type model: _type_</span>
+<span class="sd">        :param strategy_selector: Function that selects wich strategy will be used</span>
+<span class="sd">        :type strategy_selector: _type_</span>
+<span class="sd">        :param learning_strategies: Every learning strategies that will be used during the experiment</span>
+<span class="sd">        :type learning_strategies: _type_</span>
+<span class="sd">        :param first_seeds_selector: Function that selects the first points to annotate</span>
+<span class="sd">        :type first_seeds_selector: _type_</span>
+<span class="sd">        :param seeds_selection_strategies: Sampling strategies that will be used during the experiment</span>
+<span class="sd">        :type seeds_selection_strategies: _type_</span>
+<span class="sd">        :param uncertainty_fn: Function that computes the uncertainty map from the evidence map</span>
+<span class="sd">        :type uncertainty_fn: _type_</span>
+<span class="sd">        :param filtering_fn: Function used as a filter during sampling of the next seeds</span>
+<span class="sd">        :type filtering_fn: _type_</span>
+<span class="sd">        :param filtering_aux_fn: Auxiliary function that computes the region of interest for the filter</span>
+<span class="sd">        :type filtering_aux_fn: _type_</span>
+<span class="sd">        :param image: Image to segment, defaults to None</span>
+<span class="sd">        :type image: _type_, optional</span>
+<span class="sd">        :param mask_generator: Automatic mask generator, defaults to None</span>
+<span class="sd">        :type mask_generator: _type_, optional</span>
+<span class="sd">        :param use_previous_logits: _description_, defaults to True</span>
+<span class="sd">        :type use_previous_logits: Parameter for the predictor. If set to true the predictor will use previous prediction during prediction, optional</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">model</span><span class="p">,</span>
+            <span class="n">strategy_selector</span><span class="p">,</span>
+            <span class="n">learning_strategies</span><span class="p">,</span>
+            <span class="n">first_seeds_selector</span><span class="p">,</span>
+            <span class="n">seeds_selection_strategies</span><span class="p">,</span>
+            <span class="n">uncertainty_fn</span><span class="p">,</span>
+            <span class="n">filtering_fn</span><span class="p">,</span>
+            <span class="n">filtering_aux_fn</span><span class="p">,</span>
+            <span class="n">image</span><span class="p">,</span>
+            <span class="n">mask_generator</span><span class="p">,</span>
+            <span class="n">use_previous_logits</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">GT_mask</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">need_ground_truth</span> <span class="o">=</span> <span class="kc">True</span>
+
+<div class="viewcode-block" id="PseudoActiveLearningSAM.setGroundTruthMask"><a class="viewcode-back" href="../Learners.html#Learners.PseudoActiveLearningSAM.setGroundTruthMask">[docs]</a>    <span class="k">def</span> <span class="nf">setGroundTruthMask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mask</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the ground truth mask</span>
+
+<span class="sd">        :param mask: Ground truth mask</span>
+<span class="sd">        :type mask: np.ndarray</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">GT_mask</span> <span class="o">=</span> <span class="n">mask</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;uint8&quot;</span><span class="p">)</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Clément Yvernes.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

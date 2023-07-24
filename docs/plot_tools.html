@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Plot tools &mdash; Active Learning For Connectomics 0.1 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="run_model module" href="run_model.html" />
+    <link rel="prev" title="Sampling strategies" href="next_seeds_strategies.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Active Learning For Connectomics
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">ActiveLearningForConnectomics</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="AL_SAM.html">AL_SAM module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Learners.html">Learners</a></li>
+<li class="toctree-l2"><a class="reference internal" href="SAM_modifications.html">Modifications of SAM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_tools.html">Data tools</a></li>
+<li class="toctree-l2"><a class="reference internal" href="filters.html">Filters</a></li>
+<li class="toctree-l2"><a class="reference internal" href="first_seeds_selector.html">First seed selection</a></li>
+<li class="toctree-l2"><a class="reference internal" href="learning_strategies.html">Learning strategies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="next_seeds_strategies.html">Sampling strategies</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Plot tools</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#plot_tools.plotAndSave"><code class="docutils literal notranslate"><span class="pre">plotAndSave()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#plot_tools.plotAndSaveFinalIoUEvolution"><code class="docutils literal notranslate"><span class="pre">plotAndSaveFinalIoUEvolution()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#plot_tools.plotAndSaveImageWithFirstSeed"><code class="docutils literal notranslate"><span class="pre">plotAndSaveImageWithFirstSeed()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#plot_tools.plotAndSaveImageWithFirstSeedandFirstMask"><code class="docutils literal notranslate"><span class="pre">plotAndSaveImageWithFirstSeedandFirstMask()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#plot_tools.plotAndSaveImageWithGT"><code class="docutils literal notranslate"><span class="pre">plotAndSaveImageWithGT()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#plot_tools.plotAndSaveIntermediateResults"><code class="docutils literal notranslate"><span class="pre">plotAndSaveIntermediateResults()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#plot_tools.plotandSaveAggregatedResults"><code class="docutils literal notranslate"><span class="pre">plotandSaveAggregatedResults()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#plot_tools.savePercentiles"><code class="docutils literal notranslate"><span class="pre">savePercentiles()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#plot_tools.savePercentilesPlot"><code class="docutils literal notranslate"><span class="pre">savePercentilesPlot()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="run_model.html">run_model module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="strategy_selectors.html">Strategy selectors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tools.html">Tools</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Active Learning For Connectomics</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">ActiveLearningForConnectomics</a></li>
+      <li class="breadcrumb-item active">Plot tools</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/plot_tools.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-plot_tools">
+<span id="plot-tools"></span><h1>Plot tools<a class="headerlink" href="#module-plot_tools" title="Permalink to this heading"></a></h1>
+<p>This module collects every functions that are use to plot and save data in the project.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="plot_tools.plotAndSave">
+<span class="sig-prename descclassname"><span class="pre">plot_tools.</span></span><span class="sig-name descname"><span class="pre">plotAndSave</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/plot_tools.html#plotAndSave"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot_tools.plotAndSave" title="Permalink to this definition"></a></dt>
+<dd><p>This function plots and saves an image</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>arr</strong> (<em>np.array</em>) – he image to be plotted</p></li>
+<li><p><strong>name</strong> (<em>str</em>) – Name of the output file</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="plot_tools.plotAndSaveFinalIoUEvolution">
+<span class="sig-prename descclassname"><span class="pre">plot_tools.</span></span><span class="sig-name descname"><span class="pre">plotAndSaveFinalIoUEvolution</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">folder</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">NBs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">IoUs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">idx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/plot_tools.html#plotAndSaveFinalIoUEvolution"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot_tools.plotAndSaveFinalIoUEvolution" title="Permalink to this definition"></a></dt>
+<dd><p>This function plots the evolution of IoU during the experiment</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>folder</strong> (<em>str</em>) – Folder in which the figure will be saved</p></li>
+<li><p><strong>NBs</strong> (<em>list</em>) – Number of seeds at each iteration</p></li>
+<li><p><strong>IoUs</strong> (<em>list</em>) – List of all IoUs (intersection over union) at each iteration</p></li>
+<li><p><strong>idx</strong> (<em>int</em>) – Index of the image in the dataset</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="plot_tools.plotAndSaveImageWithFirstSeed">
+<span class="sig-prename descclassname"><span class="pre">plot_tools.</span></span><span class="sig-name descname"><span class="pre">plotAndSaveImageWithFirstSeed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">folder</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">first_seeds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">idx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/plot_tools.html#plotAndSaveImageWithFirstSeed"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot_tools.plotAndSaveImageWithFirstSeed" title="Permalink to this definition"></a></dt>
+<dd><p>This function plots and saves the image and the first seeds used in the first iteration</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>folder</strong> (<em>str</em>) – Folder in which the figure will be saved</p></li>
+<li><p><strong>image</strong> (<em>np.ndarray</em>) – Image</p></li>
+<li><p><strong>first_seeds</strong> (<em>list</em>) – First seeds</p></li>
+<li><p><strong>idx</strong> (<em>int</em>) – Index of the image in the dataset</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="plot_tools.plotAndSaveImageWithFirstSeedandFirstMask">
+<span class="sig-prename descclassname"><span class="pre">plot_tools.</span></span><span class="sig-name descname"><span class="pre">plotAndSaveImageWithFirstSeedandFirstMask</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">folder</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">first_mask</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">first_seeds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">idx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/plot_tools.html#plotAndSaveImageWithFirstSeedandFirstMask"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot_tools.plotAndSaveImageWithFirstSeedandFirstMask" title="Permalink to this definition"></a></dt>
+<dd><p>This function plots and save the image with the first seeds and the first mask</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>folder</strong> (<em>str</em>) – Folder in which the figure will be saved</p></li>
+<li><p><strong>image</strong> (<em>np.ndarray</em>) – Image</p></li>
+<li><p><strong>first_mask</strong> (<em>np.ndarray</em>) – First mask</p></li>
+<li><p><strong>first_seeds</strong> (<em>list</em>) – First seeds</p></li>
+<li><p><strong>idx</strong> (<em>int</em>) – Index of the image in the dataset</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="plot_tools.plotAndSaveImageWithGT">
+<span class="sig-prename descclassname"><span class="pre">plot_tools.</span></span><span class="sig-name descname"><span class="pre">plotAndSaveImageWithGT</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">folder</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">GT_mask</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">idx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/plot_tools.html#plotAndSaveImageWithGT"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot_tools.plotAndSaveImageWithGT" title="Permalink to this definition"></a></dt>
+<dd><p>This function plots and saves the image with the ground truth mask</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>folder</strong> (<em>str</em>) – Folder in which the figure will be saved</p></li>
+<li><p><strong>image</strong> (<em>np.ndarray</em>) – Image</p></li>
+<li><p><strong>GT_mask</strong> (<em>np.ndarray</em>) – Ground truth mask</p></li>
+<li><p><strong>idx</strong> (<em>int</em>) – Index of the image in the dataset</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="plot_tools.plotAndSaveIntermediateResults">
+<span class="sig-prename descclassname"><span class="pre">plot_tools.</span></span><span class="sig-name descname"><span class="pre">plotAndSaveIntermediateResults</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">folder</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">learner</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="Learners.html#Learners.ActiveLearningSAM" title="Learners.ActiveLearningSAM"><span class="pre">ActiveLearningSAM</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">next_seeds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">np.ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">GT_mask</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">np.ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">IoUs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">FNs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">FPs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">i</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">idx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">NBs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/plot_tools.html#plotAndSaveIntermediateResults"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot_tools.plotAndSaveIntermediateResults" title="Permalink to this definition"></a></dt>
+<dd><p>This function is the main function for plotting intermediate results.
+The upper left picture represents the image, seeds and the current mask segmentation.
+Red dots represent background seeds, green dots represent foreground seeds and stars represent next seeds to be annotated with the corresponding color.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>folder</strong> (<em>str</em>) – Folder in which the figure will be saved</p></li>
+<li><p><strong>learner</strong> (<a class="reference internal" href="Learners.html#Learners.ActiveLearningSAM" title="Learners.ActiveLearningSAM"><em>ActiveLearningSAM</em></a>) – Learner</p></li>
+<li><p><strong>next_seeds</strong> (<em>list</em>) – Next seeds to annotate</p></li>
+<li><p><strong>image</strong> (<em>np.ndarray</em>) – Image</p></li>
+<li><p><strong>GT_mask</strong> (<em>np.ndarray</em>) – Ground truth mask</p></li>
+<li><p><strong>IoUs</strong> (<em>list</em>) – List of all IoUs (intersection over union) at each iteration</p></li>
+<li><p><strong>FNs</strong> (<em>list</em>) – List of all false negatives at each iteration</p></li>
+<li><p><strong>FPs</strong> (<em>list</em>) – List of all false positives at each iteration</p></li>
+<li><p><strong>i</strong> (<em>int</em>) – Index of the iteration</p></li>
+<li><p><strong>idx</strong> (<em>int</em>) – Index of the image in the dataset</p></li>
+<li><p><strong>NBs</strong> (<em>list</em>) – Number of seeds at each iteration until this one</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="plot_tools.plotandSaveAggregatedResults">
+<span class="sig-prename descclassname"><span class="pre">plot_tools.</span></span><span class="sig-name descname"><span class="pre">plotandSaveAggregatedResults</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">folder</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aggregated_results</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/plot_tools.html#plotandSaveAggregatedResults"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot_tools.plotandSaveAggregatedResults" title="Permalink to this definition"></a></dt>
+<dd><p>This function plots and save the aggreagation of results on the whole dataset</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>folder</strong> (<em>str</em>) – Folder in which the figure will be saved</p></li>
+<li><p><strong>aggregated_results</strong> (<em>dict</em>) – Aggregated results</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="plot_tools.savePercentiles">
+<span class="sig-prename descclassname"><span class="pre">plot_tools.</span></span><span class="sig-name descname"><span class="pre">savePercentiles</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">learner</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="Learners.html#Learners.ActiveLearningSAM" title="Learners.ActiveLearningSAM"><span class="pre">ActiveLearningSAM</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">percentiles_points</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">percentiles</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/plot_tools.html#savePercentiles"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot_tools.savePercentiles" title="Permalink to this definition"></a></dt>
+<dd><p>This auxiliary function computes and saves percentiles at points from percentiles_points into percentiles</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>learner</strong> (<a class="reference internal" href="Learners.html#Learners.ActiveLearningSAM" title="Learners.ActiveLearningSAM"><em>ActiveLearningSAM</em></a>) – Learner</p></li>
+<li><p><strong>percentiles_points</strong> (<em>list</em>) – List containing all percentiles to be calculated</p></li>
+<li><p><strong>percentiles</strong> (<em>list</em>) – List in which results are concatenated</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="plot_tools.savePercentilesPlot">
+<span class="sig-prename descclassname"><span class="pre">plot_tools.</span></span><span class="sig-name descname"><span class="pre">savePercentilesPlot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">folder</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">NBs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">percentiles</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">idx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/plot_tools.html#savePercentilesPlot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plot_tools.savePercentilesPlot" title="Permalink to this definition"></a></dt>
+<dd><p>This function saves the evolution of percentiles during the experiment</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>folder</strong> (<em>str</em>) – Folder in which the figure will be saved</p></li>
+<li><p><strong>NBs</strong> (<em>list</em>) – Number of seeds at each iteration</p></li>
+<li><p><strong>percentiles</strong> (<em>list</em>) – Evolution of percentiles during the experiment</p></li>
+<li><p><strong>idx</strong> (<em>int</em>) – Index of the image in the dataset</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="next_seeds_strategies.html" class="btn btn-neutral float-left" title="Sampling strategies" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="run_model.html" class="btn btn-neutral float-right" title="run_model module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Clément Yvernes.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

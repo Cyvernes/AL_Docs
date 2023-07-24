@@ -1,0 +1,7 @@
+Sampling strategies
+==============================
+
+.. automodule:: next_seeds_strategies
+   :members:
+   :undoc-members:
+   :show-inheritance:

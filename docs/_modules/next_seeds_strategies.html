@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>next_seeds_strategies &mdash; Active Learning For Connectomics 0.1 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Active Learning For Connectomics
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../modules.html">ActiveLearningForConnectomics</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Active Learning For Connectomics</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Module code</a></li>
+      <li class="breadcrumb-item active">next_seeds_strategies</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for next_seeds_strategies</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">tools</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">filters</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TYPE_CHECKING</span>
+<span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">Learners</span> <span class="kn">import</span> <span class="n">ActiveLearningSAM</span>
+    
+<div class="viewcode-block" id="ArgmaxEvInSESeeds"><a class="viewcode-back" href="../next_seeds_strategies.html#next_seeds_strategies.ArgmaxEvInSESeeds">[docs]</a><span class="k">def</span> <span class="nf">ArgmaxEvInSESeeds</span><span class="p">(</span><span class="n">learner</span> <span class="p">:</span> <span class="n">ActiveLearningSAM</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;This function encodes a sampling strategy.</span>
+<span class="sd">        The seed of maximum evidence in SE seeds is selected.</span>
+<span class="sd">        learner.SE_seeds is updated accordingly</span>
+
+<span class="sd">    :param learner: Learner</span>
+<span class="sd">    :type learner: ActiveLearningSAM</span>
+<span class="sd">    :return: Next points to annotated</span>
+<span class="sd">    :rtype: list</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">evidence</span> <span class="o">=</span> <span class="n">learner</span><span class="o">.</span><span class="n">filtering_function</span><span class="p">(</span><span class="n">learner</span><span class="p">,</span> <span class="n">learner</span><span class="o">.</span><span class="n">evidence</span><span class="p">)</span>
+    <span class="n">learner</span><span class="o">.</span><span class="n">SE_Seeds</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span>
+        <span class="n">learner</span><span class="o">.</span><span class="n">SE_Seeds</span><span class="p">,</span>
+        <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">getValueinArrFromInputFormat</span><span class="p">(</span><span class="n">evidence</span><span class="p">,</span> <span class="n">x</span><span class="p">),</span>
+    <span class="p">)</span>
+    <span class="n">next_seed</span> <span class="o">=</span> <span class="n">learner</span><span class="o">.</span><span class="n">SE_Seeds</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">next_seed</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="ArgmaxUncertaintyInSESeeds"><a class="viewcode-back" href="../next_seeds_strategies.html#next_seeds_strategies.ArgmaxUncertaintyInSESeeds">[docs]</a><span class="k">def</span> <span class="nf">ArgmaxUncertaintyInSESeeds</span><span class="p">(</span><span class="n">learner</span> <span class="p">:</span> <span class="n">ActiveLearningSAM</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;This function encodes a sampling strategy.</span>
+<span class="sd">        The seed of maximum uncertainty in SE seeds is selected.</span>
+<span class="sd">        learner.SE_seeds is updated accordingly</span>
+
+<span class="sd">    :param learner: Learner</span>
+<span class="sd">    :type learner: ActiveLearningSAM</span>
+<span class="sd">    :return: Next points to annotated</span>
+<span class="sd">    :rtype: list</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">uncertainty</span> <span class="o">=</span> <span class="n">learner</span><span class="o">.</span><span class="n">uncertainty_function</span><span class="p">(</span><span class="n">learner</span><span class="o">.</span><span class="n">evidence</span><span class="p">)</span>
+    <span class="n">uncertainty</span> <span class="o">=</span> <span class="n">learner</span><span class="o">.</span><span class="n">filtering_function</span><span class="p">(</span><span class="n">learner</span><span class="p">,</span> <span class="n">uncertainty</span><span class="p">)</span>
+    <span class="n">learner</span><span class="o">.</span><span class="n">SE_Seeds</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span>
+        <span class="n">learner</span><span class="o">.</span><span class="n">SE_Seeds</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">getValueinArrFromInputFormat</span><span class="p">(</span><span class="n">uncertainty</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="n">next_seed</span> <span class="o">=</span> <span class="n">learner</span><span class="o">.</span><span class="n">SE_Seeds</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">next_seed</span><span class="p">]</span></div>
+
+
+
+<div class="viewcode-block" id="ArgmaxUncertainty"><a class="viewcode-back" href="../next_seeds_strategies.html#next_seeds_strategies.ArgmaxUncertainty">[docs]</a><span class="k">def</span> <span class="nf">ArgmaxUncertainty</span><span class="p">(</span><span class="n">learner</span> <span class="p">:</span> <span class="n">ActiveLearningSAM</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;This function encodes a sampling strategy.</span>
+<span class="sd">        The point of maximum uncertainty is selected.</span>
+
+<span class="sd">    :param learner: Learner</span>
+<span class="sd">    :type learner: ActiveLearningSAM</span>
+<span class="sd">    :return: Next points to annotate</span>
+<span class="sd">    :rtype: list</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">uncertainty</span> <span class="o">=</span> <span class="n">learner</span><span class="o">.</span><span class="n">uncertainty_function</span><span class="p">(</span><span class="n">learner</span><span class="o">.</span><span class="n">evidence</span><span class="p">)</span>
+    <span class="n">uncertainty</span> <span class="o">=</span> <span class="n">learner</span><span class="o">.</span><span class="n">filtering_function</span><span class="p">(</span><span class="n">learner</span><span class="p">,</span> <span class="n">uncertainty</span><span class="p">)</span>
+    <span class="n">cx</span><span class="p">,</span> <span class="n">cy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unravel_index</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">uncertainty</span><span class="p">),</span> <span class="n">learner</span><span class="o">.</span><span class="n">evidence</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+    <span class="n">next_seed</span> <span class="o">=</span> <span class="p">[</span><span class="n">cy</span><span class="p">,</span> <span class="n">cx</span><span class="p">]</span>  <span class="c1"># swap cx and cy to meet input format</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">next_seed</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="ArgmaxEvidence"><a class="viewcode-back" href="../next_seeds_strategies.html#next_seeds_strategies.ArgmaxEvidence">[docs]</a><span class="k">def</span> <span class="nf">ArgmaxEvidence</span><span class="p">(</span><span class="n">learner</span> <span class="p">:</span> <span class="n">ActiveLearningSAM</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;This function encodes a sampling strategy.</span>
+<span class="sd">        The point of maximum evidence is selected.</span>
+<span class="sd">        This function bears a strong resemblance to ArgmaxForegroundProbability.  </span>
+<span class="sd">        If you intend to employ filters, it is advisable to opt for ArgmaxForegroundProbability.</span>
+
+
+<span class="sd">    :param learner: Learner</span>
+<span class="sd">    :type learner: ActiveLearningSAM</span>
+<span class="sd">    :return: Next points to annotate</span>
+<span class="sd">    :rtype: list</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">learner</span><span class="o">.</span><span class="n">filtering_function</span> <span class="o">!=</span> <span class="n">hardFilter</span><span class="p">:</span>
+        <span class="ne">Warning</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+            <span class="s2">&quot;Applying a smooth filter may not work for argmaxEvidence because evidence can be non positive&quot;</span>
+        <span class="p">)</span>
+    <span class="n">evidence</span> <span class="o">=</span> <span class="n">learner</span><span class="o">.</span><span class="n">filtering_function</span><span class="p">(</span><span class="n">learner</span><span class="p">,</span> <span class="n">learner</span><span class="o">.</span><span class="n">evidence</span><span class="p">)</span>
+    <span class="n">cx</span><span class="p">,</span> <span class="n">cy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unravel_index</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">evidence</span><span class="p">),</span> <span class="n">learner</span><span class="o">.</span><span class="n">evidence</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+    <span class="n">next_seed</span> <span class="o">=</span> <span class="p">[</span><span class="n">cy</span><span class="p">,</span> <span class="n">cx</span><span class="p">]</span>  <span class="c1"># swap cx and cy to meet input format</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">next_seed</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="ArgmaxForegroundProbability"><a class="viewcode-back" href="../next_seeds_strategies.html#next_seeds_strategies.ArgmaxForegroundProbability">[docs]</a><span class="k">def</span> <span class="nf">ArgmaxForegroundProbability</span><span class="p">(</span>
+    <span class="n">learner</span> <span class="p">:</span> <span class="n">ActiveLearningSAM</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="p">(</span>
+    <span class="nb">list</span>
+<span class="p">):</span>   
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;This function encodes a sampling strategy.</span>
+<span class="sd">        The point of maximum foreground probability is selected.</span>
+<span class="sd">        This function bears a strong resemblance to ArgmaxEvidence, with the notable distinction that filters are expected to function accurately in this case. </span>
+
+<span class="sd">    :param learner: Learner</span>
+<span class="sd">    :type learner: ActiveLearningSAM,</span>
+<span class="sd">    :return: Next points to annotate</span>
+<span class="sd">    :rtype: list</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">foreground_probability</span> <span class="o">=</span> <span class="n">sigmoid</span><span class="p">(</span><span class="n">learner</span><span class="o">.</span><span class="n">evidence</span><span class="p">)</span>
+    <span class="n">foreground_probability</span> <span class="o">=</span> <span class="n">learner</span><span class="o">.</span><span class="n">filtering_function</span><span class="p">(</span><span class="n">learner</span><span class="p">,</span> <span class="n">foreground_probability</span><span class="p">)</span>
+    <span class="n">cx</span><span class="p">,</span> <span class="n">cy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unravel_index</span><span class="p">(</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">foreground_probability</span><span class="p">),</span> <span class="n">foreground_probability</span><span class="o">.</span><span class="n">shape</span>
+    <span class="p">)</span>
+    <span class="n">next_seed</span> <span class="o">=</span> <span class="p">[</span><span class="n">cy</span><span class="p">,</span> <span class="n">cx</span><span class="p">]</span>  <span class="c1"># swap cx and cy to meet input format</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">next_seed</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="ArgmaxUncertaintyPathDist"><a class="viewcode-back" href="../next_seeds_strategies.html#next_seeds_strategies.ArgmaxUncertaintyPathDist">[docs]</a><span class="k">def</span> <span class="nf">ArgmaxUncertaintyPathDist</span><span class="p">(</span><span class="n">learner</span> <span class="p">:</span> <span class="n">ActiveLearningSAM</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;This function encodes a sampling strategy.</span>
+<span class="sd">        The point of maximum distance is selected.</span>
+<span class="sd">        In this function the distance is the Uncertainty path distance.</span>
+<span class="sd">        This function might be very slow. Some speed improvements should be made.</span>
+
+<span class="sd">    :param learner: Learner</span>
+<span class="sd">    :type learner: ActiveLearningSAM</span>
+<span class="sd">    :return: Next points to annotate</span>
+<span class="sd">    :rtype: list</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">p_thresh</span> <span class="o">=</span> <span class="mf">0.95</span>
+    <span class="n">evidence_thresh</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">p_thresh</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">p_thresh</span><span class="p">))</span>
+
+    <span class="n">uncertainty</span> <span class="o">=</span> <span class="n">learner</span><span class="o">.</span><span class="n">uncertainty_function</span><span class="p">(</span><span class="n">learner</span><span class="o">.</span><span class="n">evidence</span><span class="p">)</span>
+    <span class="n">uncertainty</span> <span class="o">=</span> <span class="n">learner</span><span class="o">.</span><span class="n">filtering_function</span><span class="p">(</span><span class="n">learner</span><span class="p">,</span> <span class="n">uncertainty</span><span class="p">)</span>
+    <span class="n">thresh</span> <span class="o">=</span> <span class="n">learner</span><span class="o">.</span><span class="n">uncertainty_function</span><span class="p">(</span><span class="n">evidence_thresh</span><span class="p">)</span>
+    <span class="n">distances</span> <span class="o">=</span> <span class="n">UncertaintyPathDist</span><span class="p">(</span><span class="n">uncertainty</span><span class="p">,</span> <span class="n">learner</span><span class="o">.</span><span class="n">evidence</span><span class="p">,</span> <span class="n">thresh</span><span class="p">)</span>
+    <span class="n">cx</span><span class="p">,</span> <span class="n">cy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unravel_index</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">distances</span><span class="p">),</span> <span class="n">distances</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+    <span class="n">next_seed</span> <span class="o">=</span> <span class="p">[</span><span class="n">cy</span><span class="p">,</span> <span class="n">cx</span><span class="p">]</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">next_seed</span><span class="p">]</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Clément Yvernes.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

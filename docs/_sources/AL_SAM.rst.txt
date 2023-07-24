@@ -1,0 +1,7 @@
+AL\_SAM module
+==============
+
+.. automodule:: AL_SAM
+   :members:
+   :undoc-members:
+   :show-inheritance:

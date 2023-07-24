@@ -91,8 +91,9 @@
 
 
 <div class="viewcode-block" id="ActiveLearningSAM"><a class="viewcode-back" href="../Learners.html#Learners.ActiveLearningSAM">[docs]</a><span class="k">class</span> <span class="nc">ActiveLearningSAM</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;This is the basic class for the active Learning for Connectomics project.</span>
-<span class="sd">    This class can&#39;t access Ground Truth</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;This is the fundamental class for the active Learning for Connectomics project.</span>
+<span class="sd">        Please note that this class does not have direct access to Ground Truth data. </span>
+<span class="sd">        Instead, it is designed to work in conjunction with other components of the project to incorporate Ground Truth feedback during active learning iterations.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -185,8 +186,12 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">learning_strategies</span> <span class="o">=</span> <span class="p">[</span><span class="n">ls</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="k">for</span> <span class="n">ls</span> <span class="ow">in</span> <span class="n">learning_strategies</span><span class="p">]</span>
 
 <div class="viewcode-block" id="ActiveLearningSAM.setData"><a class="viewcode-back" href="../Learners.html#Learners.ActiveLearningSAM.setData">[docs]</a>    <span class="k">def</span> <span class="nf">setData</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">image</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Load the image into the learner</span>
-<span class="sd">        Many attributes are reinitialised</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Load the image data into the learner and initialize attributes.</span>
+<span class="sd">        </span>
+<span class="sd">        This method prepares the learner for segmentation by loading the input image data</span>
+<span class="sd">        and initializing relevant attributes. Upon calling this method, several attributes</span>
+<span class="sd">        are reinitialized to facilitate the segmentation process.</span>
+<span class="sd">        </span>
 <span class="sd">        :param image: Image to segment</span>
 <span class="sd">        :type image: np.ndarray</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -210,9 +215,13 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">nb_initial_seeds</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span></div>
 
 <div class="viewcode-block" id="ActiveLearningSAM.findFirstSeeds"><a class="viewcode-back" href="../Learners.html#Learners.ActiveLearningSAM.findFirstSeeds">[docs]</a>    <span class="k">def</span> <span class="nf">findFirstSeeds</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]],</span> <span class="nb">int</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;This method computes the first points to annotate.</span>
-
-<span class="sd">        :return: This method returns the list of first seeds to annotate and the number of seeds in SE_seeds</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute the first points to annotate.    </span>
+<span class="sd">        </span>
+<span class="sd">        This method calls the initial seed selection process usually based on the Segment Everything (SE)</span>
+<span class="sd">        approach. It generates a list of first seeds for annotation and computes the number of seeds</span>
+<span class="sd">        available for annotation in the SE_Seeds list.</span>
+<span class="sd">    </span>
+<span class="sd">        :return: A tuple containing the list of first seeds to annotate and the total number of seeds available in the SE_Seeds list.</span>
 <span class="sd">        :rtype: Tuple[List[Tuple[int, int]], int]</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">SE_masks</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span>
@@ -230,9 +239,11 @@
         <span class="k">return</span> <span class="p">(</span><span class="n">first_seeds</span><span class="p">,</span> <span class="n">nb_seeds</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="ActiveLearningSAM.learn"><a class="viewcode-back" href="../Learners.html#Learners.ActiveLearningSAM.learn">[docs]</a>    <span class="k">def</span> <span class="nf">learn</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_points</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">input_labels</span><span class="p">:</span> <span class="nb">list</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Implements an iteration of active learning</span>
-<span class="sd">        New seeds are used to improve the segmentation.</span>
-<span class="sd">        The evidence and uncertainty map are updated</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Implements an iteration of active learning to improve segmentation.</span>
+<span class="sd">        </span>
+<span class="sd">        This method represents a single iteration of the active learning process, where new seeds</span>
+<span class="sd">        (input_points) and their corresponding labels (input_labels) are used to enhance the</span>
+<span class="sd">        segmentation. The evidence and uncertainty map are updated according to the selected learning strategy.</span>
 
 <span class="sd">        :param input_points: Input seeds</span>
 <span class="sd">        :type input_points: list</span>
@@ -247,14 +258,16 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">current_strategy_idx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">strategy_selector</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">old_strat</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_strategy_idx</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">idx_when_strat_has_changed</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">input_points</span><span class="p">))</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">learning_strategies</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">current_strategy_idx</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">learning_strategies</span><span class="p">)]()</span>  <span class="c1"># apply the learning strategy</span>
+            
+        <span class="c1"># apply the selected learning strategy</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">learning_strategies</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">current_strategy_idx</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">learning_strategies</span><span class="p">)]()</span>  
         <span class="bp">self</span><span class="o">.</span><span class="n">nb_seed_used</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">input_points</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">cp_mask</span></div>
 
 <div class="viewcode-block" id="ActiveLearningSAM.findNextSeeds"><a class="viewcode-back" href="../Learners.html#Learners.ActiveLearningSAM.findNextSeeds">[docs]</a>    <span class="k">def</span> <span class="nf">findNextSeeds</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Uses the evidence map and the uncertainty map to sample the next seed to annotate.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Uses the evidence map and uncertainty map to sample the next seed for annotation.</span>
 
-<span class="sd">        :return: Next seeds to annotate</span>
+<span class="sd">        :return: The next seeds (points) to annotate based on the selected strategy.</span>
 <span class="sd">        :rtype: list</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 

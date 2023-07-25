@@ -70,7 +70,7 @@
              
   <h1>Source code for run_model</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">json</span>
-<span class="kn">from</span> <span class="nn">random</span> <span class="kn">import</span> <span class="n">random</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Optional</span>
 
 <span class="kn">import</span> <span class="nn">cv2</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
@@ -86,15 +86,26 @@
 <span class="kn">import</span> <span class="nn">strategy_selectors</span>
 <span class="kn">import</span> <span class="nn">tools</span>
 <span class="kn">from</span> <span class="nn">Learners</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">learning_strategies</span> <span class="kn">import</span> <span class="o">*</span>
 <span class="kn">from</span> <span class="nn">data_tools</span> <span class="kn">import</span> <span class="o">*</span>
 <span class="kn">from</span> <span class="nn">plot_tools</span> <span class="kn">import</span> <span class="o">*</span>
 <span class="kn">from</span> <span class="nn">tools</span> <span class="kn">import</span> <span class="o">*</span>
 
 
-<div class="viewcode-block" id="load_config"><a class="viewcode-back" href="../run_model.html#run_model.load_config">[docs]</a><span class="k">def</span> <span class="nf">load_config</span><span class="p">(</span><span class="n">base_json_file</span><span class="p">,</span> <span class="n">setting_json_file</span><span class="p">):</span>
-    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">base_json_file</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+<div class="viewcode-block" id="load_config"><a class="viewcode-back" href="../run_model.html#run_model.load_config">[docs]</a><span class="k">def</span> <span class="nf">load_config</span><span class="p">(</span><span class="n">base_json_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">setting_json_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;This function loads the configuration from base and setting JSON files.</span>
+<span class="sd">    The setting JSON file updates the base configuration.</span>
+
+<span class="sd">    :param base_json_file: Path to the base configuration JSON file</span>
+<span class="sd">    :type base_json_file: str</span>
+<span class="sd">    :param setting_json_file: Path to the setting configuration JSON file</span>
+<span class="sd">    :type setting_json_file: str</span>
+<span class="sd">    :return: Configuration dictionary</span>
+<span class="sd">    :rtype: Dict[str, Any]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">base_json_file</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
         <span class="n">base_config</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
-    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">setting_json_file</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">setting_json_file</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
         <span class="n">setting_config</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">setting_config</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">base_config</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">base_config</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="nb">dict</span><span class="p">):</span>
@@ -104,7 +115,12 @@
     <span class="k">return</span> <span class="n">base_config</span></div>
 
 
-<div class="viewcode-block" id="check_environment"><a class="viewcode-back" href="../run_model.html#run_model.check_environment">[docs]</a><span class="k">def</span> <span class="nf">check_environment</span><span class="p">():</span>
+<div class="viewcode-block" id="check_environment"><a class="viewcode-back" href="../run_model.html#run_model.check_environment">[docs]</a><span class="k">def</span> <span class="nf">check_environment</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;This function checks the environment versions</span>
+
+<span class="sd">    :return: Device to be used for computations</span>
+<span class="sd">    :rtype: torch.device</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;-------------------------------------&quot;</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;PyTorch version:&quot;</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Torchvision version:&quot;</span><span class="p">,</span> <span class="n">torchvision</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span>
@@ -112,71 +128,111 @@
     <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cuda&quot;</span> <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span> <span class="k">else</span> <span class="s2">&quot;cpu&quot;</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="load_sam"><a class="viewcode-back" href="../run_model.html#run_model.load_sam">[docs]</a><span class="k">def</span> <span class="nf">load_sam</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
+<div class="viewcode-block" id="load_sam"><a class="viewcode-back" href="../run_model.html#run_model.load_sam">[docs]</a><span class="k">def</span> <span class="nf">load_sam</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;This function loads the Segment Anything Model</span>
+
+<span class="sd">    :param config: Configuration dictionary that includes &#39;MODEL_WEIGHTS_PATH&#39; for model checkpoint, </span>
+<span class="sd">                   &#39;MODEL_TYPE&#39; for the type of the model, and &#39;DEVICE&#39; to specify the device to which </span>
+<span class="sd">                   the model will be loaded.</span>
+<span class="sd">    :type config: Dict[str, str]</span>
+<span class="sd">    :return: Loaded model</span>
+<span class="sd">    :rtype: Any</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;-------------------------------------&quot;</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Loading the model...&quot;</span><span class="p">)</span>
-    <span class="n">sam_checkpoint</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;MODEL_WEIGHTS_PATH&quot;</span><span class="p">]</span>
+    <span class="n">sam_checkpoint</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;MODEL_WEIGHTS_PATH&#39;</span><span class="p">]</span>
     <span class="n">model_type</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;MODEL_TYPE&quot;</span><span class="p">]</span>
     <span class="n">sam</span> <span class="o">=</span> <span class="n">sam_model_registry</span><span class="p">[</span><span class="n">model_type</span><span class="p">](</span><span class="n">checkpoint</span><span class="o">=</span><span class="n">sam_checkpoint</span><span class="p">)</span>
     <span class="n">sam</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;DEVICE&quot;</span><span class="p">])</span>
     <span class="k">return</span> <span class="n">sam</span></div>
 
 
-<div class="viewcode-block" id="setup_learner"><a class="viewcode-back" href="../run_model.html#run_model.setup_learner">[docs]</a><span class="k">def</span> <span class="nf">setup_learner</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">sam</span><span class="p">):</span>
-    <span class="n">learner_types</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s2">&quot;Active Learning&quot;</span><span class="p">:</span> <span class="n">ActiveLearningSAM</span><span class="p">,</span>
-        <span class="s2">&quot;Pseudo Active Learning&quot;</span><span class="p">:</span> <span class="n">PseudoActiveLearningSAM</span><span class="p">,</span>
-        <span class="s2">&quot;FPFN&quot;</span><span class="p">:</span> <span class="n">FPFNLearner</span><span class="p">,</span>
-        <span class="s2">&quot;Random&quot;</span><span class="p">:</span> <span class="n">RandomLearner</span><span class="p">,</span>
-    <span class="p">}</span>
+<div class="viewcode-block" id="setup_learner"><a class="viewcode-back" href="../run_model.html#run_model.setup_learner">[docs]</a><span class="k">def</span> <span class="nf">setup_learner</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">sam</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ActiveLearningSAM</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;This function sets up the learner based on the given configuration and the model.</span>
+
+<span class="sd">    :param config: Configuration dictionary </span>
+<span class="sd">    :type config: Dict[str, Any]</span>
+<span class="sd">    :param sam: The loaded model (usually SAM)</span>
+<span class="sd">    :type sam: Any</span>
+<span class="sd">    :return: learner</span>
+<span class="sd">    :rtype: ActiveLearningSAM</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">learner_types</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;Active Learning&quot;</span><span class="p">:</span> <span class="n">ActiveLearningSAM</span><span class="p">,</span> <span class="s2">&quot;Pseudo Active Learning&quot;</span><span class="p">:</span> <span class="n">PseudoActiveLearningSAM</span><span class="p">,</span>
+                     <span class="s2">&quot;FPFN&quot;</span><span class="p">:</span> <span class="n">FPFNLearner</span><span class="p">,</span> <span class="s2">&quot;Random&quot;</span><span class="p">:</span> <span class="n">RandomLearner</span><span class="p">}</span>
+    <span class="n">learning_strategy_types</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;BasicLS&quot;</span><span class="p">:</span> <span class="n">BasicLS</span><span class="p">,</span> <span class="s2">&quot;OneSeedForOneMaskLS&quot;</span><span class="p">:</span> <span class="n">OneSeedForOneMaskLS</span><span class="p">,</span>
+                               <span class="s2">&quot;OneSeedForOneMaskLSWithDropOut&quot;</span><span class="p">:</span> <span class="n">OneSeedForOneMaskLSWithDropOut</span><span class="p">,</span>
+                               <span class="s2">&quot;FewSeedsForOneMaskLS&quot;</span><span class="p">:</span> <span class="n">FewSeedsForOneMaskLS</span><span class="p">}</span>
+    <span class="nb">print</span><span class="p">()</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="n">LearnerClass</span> <span class="o">=</span> <span class="n">learner_types</span><span class="p">[</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;LEARNER_TYPE&quot;</span><span class="p">]]</span>
     <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unknown learner type&quot;</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">LearnerClass</span><span class="p">(</span>
-        <span class="n">sam</span><span class="p">,</span>
-        <span class="nb">getattr</span><span class="p">(</span><span class="n">strategy_selectors</span><span class="p">,</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;STRATEGY_SELECTOR&quot;</span><span class="p">]),</span>
-        <span class="p">[</span>
-            <span class="nb">getattr</span><span class="p">(</span><span class="n">learning_strategies</span><span class="p">,</span> <span class="n">strategy</span><span class="p">)</span>
-            <span class="k">for</span> <span class="n">strategy</span> <span class="ow">in</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;LEARNING_STRATEGIES&quot;</span><span class="p">]</span>
-        <span class="p">],</span>
-        <span class="nb">getattr</span><span class="p">(</span><span class="n">first_seeds_selector</span><span class="p">,</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;FIRST_SEEDS_SELECTOR&quot;</span><span class="p">]),</span>
-        <span class="p">[</span>
-            <span class="nb">getattr</span><span class="p">(</span><span class="n">next_seeds_strategies</span><span class="p">,</span> <span class="n">strategy</span><span class="p">)</span>
-            <span class="k">for</span> <span class="n">strategy</span> <span class="ow">in</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;SEED_SELECTION_STRATEGIES&quot;</span><span class="p">]</span>
-        <span class="p">],</span>
-        <span class="nb">getattr</span><span class="p">(</span><span class="n">tools</span><span class="p">,</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;UNCERTAINTY_FUNCTION_TYPE&quot;</span><span class="p">]),</span>
-        <span class="nb">getattr</span><span class="p">(</span><span class="n">filters</span><span class="p">,</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;FILTERING_FUNCTION&quot;</span><span class="p">]),</span>
-        <span class="nb">getattr</span><span class="p">(</span><span class="n">filters</span><span class="p">,</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;FILTERING_AUX_FONCTION&quot;</span><span class="p">]),</span>
-        <span class="n">use_previous_logits</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;USE_PREVIOUS_LOGITS&quot;</span><span class="p">],</span>
-    <span class="p">)</span></div>
+    <span class="k">return</span> <span class="n">LearnerClass</span><span class="p">(</span><span class="n">sam</span><span class="p">,</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">strategy_selectors</span><span class="p">,</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;STRATEGY_SELECTOR&quot;</span><span class="p">]),</span>
+                        <span class="p">[</span><span class="n">learning_strategy_types</span><span class="p">[</span><span class="n">strategy</span><span class="p">]</span> <span class="k">for</span> <span class="n">strategy</span> <span class="ow">in</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;LEARNING_STRATEGIES&quot;</span><span class="p">]],</span>
+                        <span class="c1"># [getattr(learning_strategies, strategy)() for strategy in config[&quot;LEARNING_STRATEGIES&quot;]],</span>
+                        <span class="nb">getattr</span><span class="p">(</span><span class="n">first_seeds_selector</span><span class="p">,</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;FIRST_SEEDS_SELECTOR&quot;</span><span class="p">]),</span>
+                        <span class="p">[</span><span class="nb">getattr</span><span class="p">(</span><span class="n">next_seeds_strategies</span><span class="p">,</span> <span class="n">strategy</span><span class="p">)</span> <span class="k">for</span> <span class="n">strategy</span> <span class="ow">in</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;SEED_SELECTION_STRATEGIES&quot;</span><span class="p">]],</span>
+                        <span class="nb">getattr</span><span class="p">(</span><span class="n">tools</span><span class="p">,</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;UNCERTAINTY_FUNCTION_TYPE&quot;</span><span class="p">]),</span>
+                        <span class="nb">getattr</span><span class="p">(</span><span class="n">filters</span><span class="p">,</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;FILTERING_FUNCTION&quot;</span><span class="p">]),</span>
+                        <span class="nb">getattr</span><span class="p">(</span><span class="n">filters</span><span class="p">,</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;FILTERING_AUX_FONCTION&quot;</span><span class="p">]),</span>
+                        <span class="n">use_previous_logits</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;USE_PREVIOUS_LOGITS&quot;</span><span class="p">])</span></div>
 
 
-<div class="viewcode-block" id="find_first_seeds"><a class="viewcode-back" href="../run_model.html#run_model.find_first_seeds">[docs]</a><span class="k">def</span> <span class="nf">find_first_seeds</span><span class="p">(</span><span class="n">learner</span><span class="p">,</span> <span class="n">image</span><span class="p">,</span> <span class="n">GT_mask</span><span class="p">,</span> <span class="n">idx</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
+<div class="viewcode-block" id="find_first_seeds"><a class="viewcode-back" href="../run_model.html#run_model.find_first_seeds">[docs]</a><span class="k">def</span> <span class="nf">find_first_seeds</span><span class="p">(</span><span class="n">learner</span><span class="p">:</span> <span class="n">ActiveLearningSAM</span><span class="p">,</span> <span class="n">image</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">GT_mask</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">idx</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]],</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;This function finds the first seeds based on the given image</span>
+
+<span class="sd">    :param learner: Learner</span>
+<span class="sd">    :type learner: ActiveLearningSAM</span>
+<span class="sd">    :param image: Input image.</span>
+<span class="sd">    :type image: np.ndarray</span>
+<span class="sd">    :param GT_mask: Ground truth mask.</span>
+<span class="sd">    :type GT_mask: np.ndarray</span>
+<span class="sd">    :param idx: Index of image</span>
+<span class="sd">    :type idx: int</span>
+<span class="sd">    :param config: Configuration dictionary</span>
+<span class="sd">    :type config: Dict[str, Any]</span>
+<span class="sd">    :return: The first seeds found by the learner and the number of seeds. If no seed is found, return None for both.</span>
+<span class="sd">    :rtype: Tuple[Optional[List[Any]], Optional[int]]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">learner</span><span class="o">.</span><span class="n">setData</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">learner</span><span class="o">.</span><span class="n">need_ground_truth</span><span class="p">:</span>
         <span class="n">learner</span><span class="o">.</span><span class="n">setGroundTruthMask</span><span class="p">(</span><span class="n">GT_mask</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">learner</span><span class="p">)</span>
-    <span class="n">first_seeds</span><span class="p">,</span> <span class="n">nb_seeds</span><span class="p">,</span> <span class="n">first_mask</span> <span class="o">=</span> <span class="n">learner</span><span class="o">.</span><span class="n">findFirstSeeds</span><span class="p">()</span>
+    <span class="n">first_seeds</span><span class="p">,</span> <span class="n">nb_seeds</span> <span class="o">=</span> <span class="n">learner</span><span class="o">.</span><span class="n">findFirstSeeds</span><span class="p">()</span>
 
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">first_seeds</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;No first seed was given&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
 
     <span class="k">if</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;SAVE_FIRST_SEED&quot;</span><span class="p">]:</span>
-        <span class="n">plotAndSaveImageWithFirstSeed</span><span class="p">(</span>
-            <span class="n">config</span><span class="p">[</span><span class="s2">&quot;FOLDER_FOR_INTERMEDIATE_RESULTS&quot;</span><span class="p">],</span> <span class="n">image</span><span class="p">,</span> <span class="n">first_seeds</span><span class="p">,</span> <span class="n">idx</span>
-        <span class="p">)</span>
+        <span class="n">plotAndSaveImageWithFirstSeed</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;FOLDER_FOR_INTERMEDIATE_RESULTS&quot;</span><span class="p">],</span> <span class="n">image</span><span class="p">,</span> <span class="n">first_seeds</span><span class="p">,</span> <span class="n">idx</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;SAVE_IMAGE_WITH_GT&quot;</span><span class="p">]:</span>
-        <span class="n">plotAndSaveImageWithGT</span><span class="p">(</span>
-            <span class="n">config</span><span class="p">[</span><span class="s2">&quot;FOLDER_FOR_INTERMEDIATE_RESULTS&quot;</span><span class="p">],</span> <span class="n">image</span><span class="p">,</span> <span class="n">GT_mask</span><span class="p">,</span> <span class="n">idx</span>
-        <span class="p">)</span>
+        <span class="n">plotAndSaveImageWithGT</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;FOLDER_FOR_INTERMEDIATE_RESULTS&quot;</span><span class="p">],</span> <span class="n">image</span><span class="p">,</span> <span class="n">GT_mask</span><span class="p">,</span> <span class="n">idx</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">first_seeds</span><span class="p">,</span> <span class="n">nb_seeds</span></div>
 
 
-<div class="viewcode-block" id="run_learning_process"><a class="viewcode-back" href="../run_model.html#run_model.run_learning_process">[docs]</a><span class="k">def</span> <span class="nf">run_learning_process</span><span class="p">(</span><span class="n">learner</span><span class="p">,</span> <span class="n">GT_mask</span><span class="p">,</span> <span class="n">first_seeds</span><span class="p">,</span> <span class="n">nb_seeds</span><span class="p">,</span> <span class="n">image</span><span class="p">,</span> <span class="n">idx</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
+<div class="viewcode-block" id="run_learning_process"><a class="viewcode-back" href="../run_model.html#run_model.run_learning_process">[docs]</a><span class="k">def</span> <span class="nf">run_learning_process</span><span class="p">(</span><span class="n">learner</span><span class="p">:</span> <span class="n">ActiveLearningSAM</span><span class="p">,</span> <span class="n">GT_mask</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">first_seeds</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span> <span class="n">nb_seeds</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">image</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">idx</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;This function runs the learning process on the image using the given learner, ground truth mask, first seeds, number of seeds, index, and configuration.</span>
+
+<span class="sd">    :param learner: Learner</span>
+<span class="sd">    :type learner: ActiveLearningSAM</span>
+<span class="sd">    :param GT_mask: Ground truth mask</span>
+<span class="sd">    :type GT_mask: np.ndarray</span>
+<span class="sd">    :param first_seeds: The first seeds to be used in the learning process</span>
+<span class="sd">    :type first_seeds: List[Any]</span>
+<span class="sd">    :param nb_seeds: Number of seeds</span>
+<span class="sd">    :type nb_seeds: int</span>
+<span class="sd">    :param image: Input image</span>
+<span class="sd">    :type image: np.ndarray</span>
+<span class="sd">    :param idx: Index of image</span>
+<span class="sd">    :type idx: int</span>
+<span class="sd">    :param config: Configuration dictionary </span>
+<span class="sd">    :type config: Dict[str, Any]</span>
+<span class="sd">    :return: A dictionary containing lists of numbers of input points (&#39;NBs&#39;), intersection over union scores (&#39;IoUs&#39;), false positives (&#39;FPs&#39;), false negatives (&#39;FNs&#39;), and percentiles (&#39;percentiles&#39;).</span>
+<span class="sd">    :rtype: Dict[str, list]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">input_points</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">input_labels</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">IoUs</span> <span class="o">=</span> <span class="p">[]</span>
@@ -186,11 +242,7 @@
     <span class="n">percentiles_points</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
     <span class="n">percentiles</span> <span class="o">=</span> <span class="p">[[]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">percentiles_points</span><span class="p">]</span>
     <span class="n">next_seeds</span> <span class="o">=</span> <span class="n">first_seeds</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-    <span class="n">budget</span> <span class="o">=</span> <span class="p">(</span>
-        <span class="n">config</span><span class="p">[</span><span class="s2">&quot;training_parameters&quot;</span><span class="p">][</span><span class="s2">&quot;ANNOTATION_BUDGET&quot;</span><span class="p">]</span>
-        <span class="k">if</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;training_parameters&quot;</span><span class="p">][</span><span class="s2">&quot;USE_BUDGET&quot;</span><span class="p">]</span>
-        <span class="k">else</span> <span class="n">nb_seeds</span>
-    <span class="p">)</span>
+    <span class="n">budget</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;training_parameters&quot;</span><span class="p">][</span><span class="s2">&quot;ANNOTATION_BUDGET&quot;</span><span class="p">]</span> <span class="k">if</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;training_parameters&quot;</span><span class="p">][</span><span class="s2">&quot;USE_BUDGET&quot;</span><span class="p">]</span> <span class="k">else</span> <span class="n">nb_seeds</span>
     <span class="n">nb_annotations</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="n">count</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="k">while</span> <span class="n">nb_annotations</span> <span class="o">&lt;</span> <span class="n">budget</span><span class="p">:</span>
@@ -208,43 +260,33 @@
             <span class="n">next_seeds</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">count</span> <span class="o">+=</span> <span class="mi">1</span>
         <span class="k">if</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;plot_parameters&quot;</span><span class="p">][</span><span class="s2">&quot;SAVE_INTERMEDIATE_RESULTS&quot;</span><span class="p">]:</span>
-            <span class="n">plotAndSaveIntermediateResults</span><span class="p">(</span>
-                <span class="n">config</span><span class="p">[</span><span class="s2">&quot;plot_parameters&quot;</span><span class="p">][</span><span class="s2">&quot;FOLDER_FOR_INTERMEDIATE_RESULTS&quot;</span><span class="p">],</span>
-                <span class="n">learner</span><span class="p">,</span>
-                <span class="n">next_seeds</span><span class="p">,</span>
-                <span class="n">image</span><span class="p">,</span>
-                <span class="n">GT_mask</span><span class="p">,</span>
-                <span class="n">IoUs</span><span class="p">,</span>
-                <span class="n">FNs</span><span class="p">,</span>
-                <span class="n">FPs</span><span class="p">,</span>
-                <span class="n">count</span><span class="p">,</span>
-                <span class="n">idx</span><span class="p">,</span>
-                <span class="n">NBs</span><span class="p">,</span>
-            <span class="p">)</span>
-        <span class="k">if</span> <span class="p">(</span>
-            <span class="n">nb_annotations</span> <span class="o">==</span> <span class="n">budget</span> <span class="o">-</span> <span class="mi">1</span>
-            <span class="ow">and</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;plot_parameters&quot;</span><span class="p">][</span><span class="s2">&quot;SAVE_FINAL_RESULT&quot;</span><span class="p">]</span>
-        <span class="p">):</span>
-            <span class="n">plotAndSaveIntermediateResults</span><span class="p">(</span>
-                <span class="n">config</span><span class="p">[</span><span class="s2">&quot;plot_parameters&quot;</span><span class="p">][</span><span class="s2">&quot;FOLDER_FOR_INTERMEDIATE_RESULTS&quot;</span><span class="p">],</span>
-                <span class="n">learner</span><span class="p">,</span>
-                <span class="n">next_seeds</span><span class="p">,</span>
-                <span class="n">image</span><span class="p">,</span>
-                <span class="n">GT_mask</span><span class="p">,</span>
-                <span class="n">IoUs</span><span class="p">,</span>
-                <span class="n">FNs</span><span class="p">,</span>
-                <span class="n">FPs</span><span class="p">,</span>
-                <span class="n">count</span><span class="p">,</span>
-                <span class="n">idx</span><span class="p">,</span>
-                <span class="n">NBs</span><span class="p">,</span>
-            <span class="p">)</span>
+            <span class="n">plotAndSaveIntermediateResults</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;plot_parameters&quot;</span><span class="p">][</span><span class="s2">&quot;FOLDER_FOR_INTERMEDIATE_RESULTS&quot;</span><span class="p">],</span> <span class="n">learner</span><span class="p">,</span>
+                                           <span class="n">next_seeds</span><span class="p">,</span> <span class="n">image</span><span class="p">,</span> <span class="n">GT_mask</span><span class="p">,</span> <span class="n">IoUs</span><span class="p">,</span> <span class="n">FNs</span><span class="p">,</span> <span class="n">FPs</span><span class="p">,</span> <span class="n">count</span><span class="p">,</span> <span class="n">idx</span><span class="p">,</span> <span class="n">NBs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">nb_annotations</span> <span class="o">==</span> <span class="n">budget</span> <span class="o">-</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;plot_parameters&quot;</span><span class="p">][</span><span class="s2">&quot;SAVE_FINAL_RESULT&quot;</span><span class="p">]:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;True&quot;</span><span class="p">)</span>
+            <span class="n">plotAndSaveIntermediateResults</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;plot_parameters&quot;</span><span class="p">][</span><span class="s2">&quot;FOLDER_FOR_INTERMEDIATE_RESULTS&quot;</span><span class="p">],</span> <span class="n">learner</span><span class="p">,</span>
+                                           <span class="n">next_seeds</span><span class="p">,</span> <span class="n">image</span><span class="p">,</span> <span class="n">GT_mask</span><span class="p">,</span> <span class="n">IoUs</span><span class="p">,</span> <span class="n">FNs</span><span class="p">,</span> <span class="n">FPs</span><span class="p">,</span> <span class="n">count</span><span class="p">,</span> <span class="n">idx</span><span class="p">,</span> <span class="n">NBs</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;plot_parameters&quot;</span><span class="p">][</span><span class="s2">&quot;SAVE_UNCERTAINTY_PERCENTILES&quot;</span><span class="p">]:</span>
             <span class="n">savePercentiles</span><span class="p">(</span><span class="n">learner</span><span class="p">,</span> <span class="n">percentiles_points</span><span class="p">,</span> <span class="n">percentiles</span><span class="p">)</span>
 
-    <span class="k">return</span> <span class="n">NBs</span><span class="p">,</span> <span class="n">IoUs</span><span class="p">,</span> <span class="n">FPs</span><span class="p">,</span> <span class="n">FNs</span><span class="p">,</span> <span class="n">percentiles</span></div>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;NBs&quot;</span><span class="p">:</span> <span class="n">NBs</span><span class="p">,</span> <span class="s2">&quot;IoUs&quot;</span><span class="p">:</span> <span class="n">IoUs</span><span class="p">,</span> <span class="s2">&quot;FPs&quot;</span><span class="p">:</span> <span class="n">FPs</span><span class="p">,</span> <span class="s2">&quot;FNs&quot;</span><span class="p">:</span> <span class="n">FNs</span><span class="p">,</span> <span class="s2">&quot;percentiles&quot;</span><span class="p">:</span> <span class="n">percentiles</span><span class="p">}</span></div>
 
 
-<div class="viewcode-block" id="plots_for_single_image"><a class="viewcode-back" href="../run_model.html#run_model.plots_for_single_image">[docs]</a><span class="k">def</span> <span class="nf">plots_for_single_image</span><span class="p">(</span><span class="n">NBs</span><span class="p">,</span> <span class="n">IoUs</span><span class="p">,</span> <span class="n">FPs</span><span class="p">,</span> <span class="n">FNs</span><span class="p">,</span> <span class="n">percentiles</span><span class="p">,</span> <span class="n">idx</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
+
+<div class="viewcode-block" id="plots_for_single_image"><a class="viewcode-back" href="../run_model.html#run_model.plots_for_single_image">[docs]</a><span class="k">def</span> <span class="nf">plots_for_single_image</span><span class="p">(</span><span class="n">NBs</span><span class="p">:</span> <span class="n">List</span><span class="p">,</span> <span class="n">IoUs</span><span class="p">:</span> <span class="n">List</span><span class="p">,</span> <span class="n">percentiles</span><span class="p">:</span> <span class="n">List</span><span class="p">,</span> <span class="n">idx</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;This function creates and saves plots for a single image.</span>
+
+<span class="sd">    :param NBs: List of numbers of input points.</span>
+<span class="sd">    :type NBs: List</span>
+<span class="sd">    :param IoUs: List of Intersection over Union scores.</span>
+<span class="sd">    :type IoUs: List</span>
+<span class="sd">    :param percentiles: List of percentile values.</span>
+<span class="sd">    :type percentiles: List</span>
+<span class="sd">    :param idx: Index of image.</span>
+<span class="sd">    :type idx: int</span>
+<span class="sd">    :param config: Configuration dictionary.</span>
+<span class="sd">    :type config: Dict[str, Any]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">max_IoU</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">IoUs</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">iou</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">IoUs</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">iou</span> <span class="o">&gt;=</span> <span class="mf">0.9</span> <span class="o">*</span> <span class="n">max_IoU</span><span class="p">:</span>
@@ -257,77 +299,83 @@
         <span class="n">plotAndSaveFinalIoUEvolution</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;FOLDER_FOR_FINAL_RESULTS&quot;</span><span class="p">],</span> <span class="n">NBs</span><span class="p">,</span> <span class="n">IoUs</span><span class="p">,</span> <span class="n">idx</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="run_model_single_image"><a class="viewcode-back" href="../run_model.html#run_model.run_model_single_image">[docs]</a><span class="k">def</span> <span class="nf">run_model_single_image</span><span class="p">(</span>
-    <span class="n">learner</span><span class="p">,</span> <span class="n">image_link</span><span class="p">,</span> <span class="n">mask_link</span><span class="p">,</span> <span class="n">idx</span><span class="p">,</span> <span class="n">aggregated_results</span><span class="p">,</span> <span class="n">config</span>
-<span class="p">):</span>
+<div class="viewcode-block" id="run_model_single_image"><a class="viewcode-back" href="../run_model.html#run_model.run_model_single_image">[docs]</a><span class="k">def</span> <span class="nf">run_model_single_image</span><span class="p">(</span><span class="n">learner</span><span class="p">:</span> <span class="n">ActiveLearningSAM</span><span class="p">,</span> <span class="n">image_link</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">mask_link</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">idx</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">aggregated_results</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">],</span> <span class="n">config</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;This function runs the model on a single image</span>
+
+<span class="sd">    :param learner: Learner</span>
+<span class="sd">    :type learner: ActiveLearningSAM</span>
+<span class="sd">    :param image_link: Path to the image file</span>
+<span class="sd">    :type image_link: str</span>
+<span class="sd">    :param mask_link: Path to the mask file</span>
+<span class="sd">    :type mask_link: str</span>
+<span class="sd">    :param idx: Index of the image</span>
+<span class="sd">    :type idx: int</span>
+<span class="sd">    :param aggregated_results: A dictionary containing results from previous runs</span>
+<span class="sd">    :type aggregated_results: Dict[str, list]</span>
+<span class="sd">    :param config: Configuration dictionary</span>
+<span class="sd">    :type config: Dict[str, Any]</span>
+<span class="sd">    :return: Updated aggregated_results if first seeds are found; None otherwise</span>
+<span class="sd">    :rtype: Optional[Dict[str, Any]]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">image</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="n">image_link</span><span class="p">)</span>
     <span class="n">GT_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">cv2</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="n">mask_link</span><span class="p">)</span> <span class="o">!=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
 
-    <span class="n">first_seeds</span><span class="p">,</span> <span class="n">nb_seeds</span> <span class="o">=</span> <span class="n">find_first_seeds</span><span class="p">(</span>
-        <span class="n">learner</span><span class="p">,</span> <span class="n">image</span><span class="p">,</span> <span class="n">GT_mask</span><span class="p">,</span> <span class="n">idx</span><span class="p">,</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;plot_parameters&quot;</span><span class="p">]</span>
-    <span class="p">)</span>
-    <span class="n">NBs</span><span class="p">,</span> <span class="n">IoUs</span><span class="p">,</span> <span class="n">FPs</span><span class="p">,</span> <span class="n">FNs</span><span class="p">,</span> <span class="n">percentiles</span> <span class="o">=</span> <span class="n">run_learning_process</span><span class="p">(</span>
-        <span class="n">learner</span><span class="p">,</span> <span class="n">GT_mask</span><span class="p">,</span> <span class="n">first_seeds</span><span class="p">,</span> <span class="n">nb_seeds</span><span class="p">,</span> <span class="n">image</span><span class="p">,</span> <span class="n">idx</span><span class="p">,</span> <span class="n">config</span>
-    <span class="p">)</span>
-    <span class="n">plots_for_single_image</span><span class="p">(</span>
-        <span class="n">NBs</span><span class="p">,</span> <span class="n">IoUs</span><span class="p">,</span> <span class="n">FPs</span><span class="p">,</span> <span class="n">FNs</span><span class="p">,</span> <span class="n">percentiles</span><span class="p">,</span> <span class="n">idx</span><span class="p">,</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;plot_parameters&quot;</span><span class="p">]</span>
-    <span class="p">)</span>
+    <span class="n">first_seeds</span><span class="p">,</span> <span class="n">nb_seeds</span> <span class="o">=</span> <span class="n">find_first_seeds</span><span class="p">(</span><span class="n">learner</span><span class="p">,</span> <span class="n">image</span><span class="p">,</span> <span class="n">GT_mask</span><span class="p">,</span> <span class="n">idx</span><span class="p">,</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;plot_parameters&quot;</span><span class="p">])</span>
+    <span class="k">if</span> <span class="n">first_seeds</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> <span class="k">return</span> <span class="kc">None</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">run_learning_process</span><span class="p">(</span><span class="n">learner</span><span class="p">,</span> <span class="n">GT_mask</span><span class="p">,</span> <span class="n">first_seeds</span><span class="p">,</span> <span class="n">nb_seeds</span><span class="p">,</span> <span class="n">image</span><span class="p">,</span> <span class="n">idx</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span>
+    <span class="n">plots_for_single_image</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s1">&#39;NBs&#39;</span><span class="p">],</span> <span class="n">result</span><span class="p">[</span><span class="s1">&#39;IoUs&#39;</span><span class="p">],</span> <span class="n">result</span><span class="p">[</span><span class="s1">&#39;percentiles&#39;</span><span class="p">],</span> <span class="n">idx</span><span class="p">,</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;plot_parameters&quot;</span><span class="p">])</span>
 
     <span class="k">if</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;plot_parameters&quot;</span><span class="p">][</span><span class="s2">&quot;SAVE_AGGREGATED_RESULTS&quot;</span><span class="p">]:</span>
-        <span class="n">max_IoU_index</span> <span class="o">=</span> <span class="n">IoUs</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">IoUs</span><span class="p">))</span>
-        <span class="n">aggregated_results</span><span class="p">[</span><span class="s2">&quot;images_max_IoUs&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">IoUs</span><span class="p">[</span><span class="n">max_IoU_index</span><span class="p">])</span>
-        <span class="n">aggregated_results</span><span class="p">[</span><span class="s2">&quot;images_FPs_at_max_IoU&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">FPs</span><span class="p">[</span><span class="n">max_IoU_index</span><span class="p">])</span>
-        <span class="n">aggregated_results</span><span class="p">[</span><span class="s2">&quot;images_FNs_at_max_IoU&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">FNs</span><span class="p">[</span><span class="n">max_IoU_index</span><span class="p">])</span>
-        <span class="n">aggregated_results</span><span class="p">[</span><span class="s2">&quot;images_nb_seeds&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">nb_seeds</span><span class="p">)</span>
+        <span class="n">max_IoU_index</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s1">&#39;IoUs&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s1">&#39;IoUs&#39;</span><span class="p">]))</span>
+        <span class="n">aggregated_results</span><span class="p">[</span><span class="s1">&#39;images_max_IoUs&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s1">&#39;IoUs&#39;</span><span class="p">][</span><span class="n">max_IoU_index</span><span class="p">])</span>
+        <span class="n">aggregated_results</span><span class="p">[</span><span class="s1">&#39;images_FPs_at_max_IoU&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s1">&#39;FPs&#39;</span><span class="p">][</span><span class="n">max_IoU_index</span><span class="p">])</span>
+        <span class="n">aggregated_results</span><span class="p">[</span><span class="s1">&#39;images_FNs_at_max_IoU&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s1">&#39;FNs&#39;</span><span class="p">][</span><span class="n">max_IoU_index</span><span class="p">])</span>
+        <span class="n">aggregated_results</span><span class="p">[</span><span class="s1">&#39;images_nb_seeds&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">nb_seeds</span><span class="p">)</span>
+        <span class="n">aggregated_results</span><span class="p">[</span><span class="s1">&#39;images_max_IoUs_index&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">max_IoU_index</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">max_IoU_index</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">aggregated_results</span></div>
 
 
-<div class="viewcode-block" id="run_model_dataset"><a class="viewcode-back" href="../run_model.html#run_model.run_model_dataset">[docs]</a><span class="k">def</span> <span class="nf">run_model_dataset</span><span class="p">(</span><span class="n">learner</span><span class="p">,</span> <span class="n">images_links</span><span class="p">,</span> <span class="n">masks_links</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
+<div class="viewcode-block" id="run_model_dataset"><a class="viewcode-back" href="../run_model.html#run_model.run_model_dataset">[docs]</a><span class="k">def</span> <span class="nf">run_model_dataset</span><span class="p">(</span><span class="n">learner</span><span class="p">:</span> <span class="n">ActiveLearningSAM</span><span class="p">,</span> <span class="n">images_links</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">masks_links</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">config</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;This function runs the model on a dataset</span>
+
+<span class="sd">    :param learner: Learner</span>
+<span class="sd">    :type learner: ActiveLearningSAM</span>
+<span class="sd">    :param images_links: List of paths to the image files</span>
+<span class="sd">    :type images_links: List[str]</span>
+<span class="sd">    :param masks_links: List of paths to the mask files</span>
+<span class="sd">    :type masks_links: List[str]</span>
+<span class="sd">    :param config: Configuration dictionary</span>
+<span class="sd">    :type config: Dict[str, Any]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">aggregated_results</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="k">if</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;plot_parameters&quot;</span><span class="p">][</span><span class="s2">&quot;SAVE_AGGREGATED_RESULTS&quot;</span><span class="p">]:</span>
-        <span class="n">aggregated_results</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s2">&quot;images_max_IoUs&quot;</span><span class="p">:</span> <span class="p">[],</span>
-            <span class="s2">&quot;images_FPs_at_max_IoU&quot;</span><span class="p">:</span> <span class="p">[],</span>
-            <span class="s2">&quot;images_FNs_at_max_IoU&quot;</span><span class="p">:</span> <span class="p">[],</span>
-            <span class="s2">&quot;images_percentiles&quot;</span><span class="p">:</span> <span class="p">[],</span>
-            <span class="s2">&quot;images_nb_seeds&quot;</span><span class="p">:</span> <span class="p">[],</span>
-        <span class="p">}</span>
-    <span class="n">total_number_images</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span>
-        <span class="n">config</span><span class="p">[</span><span class="s2">&quot;training_parameters&quot;</span><span class="p">][</span><span class="s2">&quot;TRAIN_RATIO&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">images_links</span><span class="p">)</span>
-    <span class="p">)</span>
+        <span class="n">aggregated_results</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;images_max_IoUs&#39;</span><span class="p">:</span> <span class="p">[],</span> <span class="s1">&#39;images_FPs_at_max_IoU&#39;</span><span class="p">:</span> <span class="p">[],</span> <span class="s1">&#39;images_FNs_at_max_IoU&#39;</span><span class="p">:</span> <span class="p">[],</span>
+                              <span class="s1">&#39;images_percentiles&#39;</span><span class="p">:</span> <span class="p">[],</span> <span class="s1">&#39;images_nb_seeds&#39;</span><span class="p">:</span> <span class="p">[],</span> <span class="s1">&#39;images_max_IoUs_index&#39;</span><span class="p">:</span> <span class="p">[]}</span>
+    <span class="n">total_number_images</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;training_parameters&quot;</span><span class="p">][</span><span class="s2">&quot;TRAIN_RATIO&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">images_links</span><span class="p">))</span>
     <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">total_number_images</span><span class="p">):</span>
-        <span class="nb">print</span><span class="p">(</span>
-            <span class="s2">&quot;-------------------------------------&quot;</span><span class="p">,</span> <span class="n">idx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="n">total_number_images</span>
-        <span class="p">)</span>
-        <span class="k">if</span> <span class="p">(</span>
-            <span class="n">run_model_single_image</span><span class="p">(</span>
-                <span class="n">learner</span><span class="p">,</span>
-                <span class="n">images_links</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span>
-                <span class="n">masks_links</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span>
-                <span class="n">idx</span><span class="p">,</span>
-                <span class="n">aggregated_results</span><span class="p">,</span>
-                <span class="n">config</span><span class="p">,</span>
-            <span class="p">)</span>
-            <span class="ow">is</span> <span class="kc">None</span>
-        <span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;-------------------------------------&quot;</span><span class="p">,</span> <span class="n">idx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="n">total_number_images</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">run_model_single_image</span><span class="p">(</span><span class="n">learner</span><span class="p">,</span> <span class="n">images_links</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span> <span class="n">masks_links</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span> <span class="n">idx</span><span class="p">,</span> <span class="n">aggregated_results</span><span class="p">,</span>
+                                  <span class="n">config</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">continue</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">aggregated_results</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;plot_parameters&quot;</span><span class="p">][</span><span class="s2">&quot;SAVE_AGGREGATED_RESULTS&quot;</span><span class="p">]:</span>
-        <span class="n">plotandSaveAggregatedResults</span><span class="p">(</span>
-            <span class="n">config</span><span class="p">[</span><span class="s2">&quot;plot_parameters&quot;</span><span class="p">][</span><span class="s2">&quot;FOLDER_FOR_FINAL_RESULTS&quot;</span><span class="p">],</span> <span class="n">aggregated_results</span>
-        <span class="p">)</span></div>
+        <span class="n">plotandSaveAggregatedResults</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;plot_parameters&quot;</span><span class="p">][</span><span class="s2">&quot;FOLDER_FOR_FINAL_RESULTS&quot;</span><span class="p">],</span> <span class="n">aggregated_results</span><span class="p">)</span></div>
 
 
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Main function of the pipeline to run on dataset</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Print&quot;</span><span class="p">)</span>
-    <span class="n">config</span> <span class="o">=</span> <span class="n">load_config</span><span class="p">(</span><span class="s2">&quot;./config/base_config.json&quot;</span><span class="p">,</span> <span class="s2">&quot;./config/setting1_config.json&quot;</span><span class="p">)</span>
+    <span class="n">config</span> <span class="o">=</span> <span class="n">load_config</span><span class="p">(</span><span class="s2">&quot;./config/base_config.json&quot;</span><span class="p">,</span> <span class="s2">&quot;./config/setting_AL2_config_seed.json&quot;</span><span class="p">)</span>
     <span class="n">config</span><span class="p">[</span><span class="s2">&quot;model_parameters&quot;</span><span class="p">][</span><span class="s2">&quot;DEVICE&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">check_environment</span><span class="p">()</span>
 
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Training&quot;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;learner_parameters&quot;</span><span class="p">])</span>
     <span class="n">sam</span> <span class="o">=</span> <span class="n">load_sam</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;model_parameters&quot;</span><span class="p">])</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;learner_parameters&quot;</span><span class="p">])</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;training_parameters&quot;</span><span class="p">])</span>
     <span class="n">learner</span> <span class="o">=</span> <span class="n">setup_learner</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;learner_parameters&quot;</span><span class="p">],</span> <span class="n">sam</span><span class="p">)</span>
-    <span class="c1"># images_links, masks_links = retrieveLinksForOneImageInEachFolder(config[&quot;data_parameters&quot;])</span>
     <span class="n">images_links</span><span class="p">,</span> <span class="n">masks_links</span> <span class="o">=</span> <span class="n">retrieveLinksForFolder</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;data_parameters&quot;</span><span class="p">])</span>
     <span class="n">run_model_dataset</span><span class="p">(</span><span class="n">learner</span><span class="p">,</span> <span class="n">images_links</span><span class="p">,</span> <span class="n">masks_links</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span>
 </pre></div>
@@ -339,7 +387,7 @@
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2023, Clément Yvernes.</p>
+    <p>&#169; Copyright 2023, Clément Yvernes &amp; Rosetta Hu.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

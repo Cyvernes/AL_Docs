@@ -69,11 +69,24 @@
            <div itemprop="articleBody">
              
   <h1>Source code for data_tools</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">os</span>
+<span></span><span class="sd">&quot;&quot;&quot; This module provides functionality for retrieving links to images and masks stored in specified directories. </span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">glob</span>
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Any</span>
 
+<span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
 
-<div class="viewcode-block" id="retrieveLinksForFolder"><a class="viewcode-back" href="../data_tools.html#data_tools.retrieveLinksForFolder">[docs]</a><span class="k">def</span> <span class="nf">retrieveLinksForFolder</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
+<div class="viewcode-block" id="retrieveLinksForFolder"><a class="viewcode-back" href="../data_tools.html#data_tools.retrieveLinksForFolder">[docs]</a><span class="k">def</span> <span class="nf">retrieveLinksForFolder</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;This function retrieves the links for all images and their corresponding masks </span>
+<span class="sd">    in a specified folder. </span>
+
+<span class="sd">    :param config: Configuration dictionary with keys &quot;IMAGE_FOLDER&quot; and &quot;NUMBER_OF_IMAGES&quot;</span>
+<span class="sd">    :type config: Dict[str, Any]</span>
+<span class="sd">    :return: Lists of image and mask filepaths</span>
+<span class="sd">    :rtype: Tuple[List[str], List[str]]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">images_links</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">masks_links</span> <span class="o">=</span> <span class="p">[]</span>
 
@@ -86,14 +99,25 @@
     <span class="k">if</span> <span class="n">img_files</span> <span class="ow">and</span> <span class="n">mask_files</span><span class="p">:</span>
         <span class="n">img_files</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
         <span class="n">mask_files</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
-        <span class="n">images_links</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">img_files</span><span class="p">)</span>  <span class="c1"># Add all image files to the list</span>
-        <span class="n">masks_links</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">mask_files</span><span class="p">)</span>  <span class="c1"># Add all mask files to the list</span>
+        <span class="c1"># images_links.extend(img_files)  # Add all image files to the list</span>
+        <span class="c1"># masks_links.extend(mask_files)  # Add all mask files to the list</span>
+
+        <span class="n">combined</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">img_files</span><span class="p">,</span> <span class="n">mask_files</span><span class="p">))</span>
+        <span class="n">combined_sample</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">combined</span><span class="p">,</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;NUMBER_OF_IMAGES&quot;</span><span class="p">])</span> <span class="c1"># Randomly sample images</span>
+        <span class="n">images_links</span><span class="p">,</span> <span class="n">masks_links</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">combined_sample</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">images_links</span><span class="p">,</span> <span class="n">masks_links</span></div>
 
 
-<div class="viewcode-block" id="retrieveLinksForOneImageInEachFolder"><a class="viewcode-back" href="../data_tools.html#data_tools.retrieveLinksForOneImageInEachFolder">[docs]</a><span class="k">def</span> <span class="nf">retrieveLinksForOneImageInEachFolder</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>  <span class="c1"># R</span>
-    <span class="c1"># Retrieve one image from each folder</span>
+<div class="viewcode-block" id="retrieveLinksForOneImageInEachFolder"><a class="viewcode-back" href="../data_tools.html#data_tools.retrieveLinksForOneImageInEachFolder">[docs]</a><span class="k">def</span> <span class="nf">retrieveLinksForOneImageInEachFolder</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;This function retrieves the links for one image and its corresponding mask</span>
+<span class="sd">    from each subfolder within a specified directory.</span>
+
+<span class="sd">    :param config: Configuration dictionary with key &quot;BASE_DIR&quot;</span>
+<span class="sd">    :type config: Dict[str, Any]</span>
+<span class="sd">    :return: Lists of image and mask filepaths</span>
+<span class="sd">    :rtype: Tuple[List[str], List[str]]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">subdirs</span> <span class="o">=</span> <span class="p">[</span>
         <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;BASE_DIR&quot;</span><span class="p">],</span> <span class="n">d</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;BASE_DIR&quot;</span><span class="p">])</span>
@@ -126,7 +150,7 @@
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2023, Clément Yvernes.</p>
+    <p>&#169; Copyright 2023, Clément Yvernes &amp; Rosetta Hu.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

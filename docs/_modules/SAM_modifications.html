@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SAM_modifications &mdash; Active Learning For Connectomics 0.1 documentation</title>
+  <title>SAM_modifications &mdash; Active Learning For Connectomics 0.2 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -84,9 +84,14 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">dropout</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Dropout</span><span class="p">(</span><span class="n">p</span><span class="o">=</span><span class="n">p</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">use_dropout</span> <span class="o">=</span> <span class="n">use_dropout</span>
 
-<div class="viewcode-block" id="SamPredictorWithDropOut.setDropOutParameter"><a class="viewcode-back" href="../SAM_modifications.html#SAM_modifications.SamPredictorWithDropOut.setDropOutParameter">[docs]</a>    <span class="k">def</span> <span class="nf">setDropOutParameter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">p</span> <span class="o">=</span> <span class="n">p</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">dropout</span><span class="o">.</span><span class="n">p</span> <span class="o">=</span> <span class="n">p</span></div>
+<div class="viewcode-block" id="SamPredictorWithDropOut.setDropOutParameter"><a class="viewcode-back" href="../SAM_modifications.html#SAM_modifications.SamPredictorWithDropOut.setDropOutParameter">[docs]</a>    <span class="k">def</span> <span class="nf">setDropOutParameter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span> <span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">      </span><span class="sd">&quot;&quot;&quot;Method that sets the dropout parameter of the predictor.</span>
+
+<span class="sd">      :param p: New dropout rate</span>
+<span class="sd">      :type p: flaot</span>
+<span class="sd">      &quot;&quot;&quot;</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">p</span> <span class="o">=</span> <span class="n">p</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">dropout</span><span class="o">.</span><span class="n">p</span> <span class="o">=</span> <span class="n">p</span></div>
 
 <div class="viewcode-block" id="SamPredictorWithDropOut.predict_torch"><a class="viewcode-back" href="../SAM_modifications.html#SAM_modifications.SamPredictorWithDropOut.predict_torch">[docs]</a>    <span class="nd">@torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">()</span>
     <span class="k">def</span> <span class="nf">predict_torch</span><span class="p">(</span>
@@ -98,8 +103,8 @@
         <span class="n">multimask_output</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
         <span class="n">return_logits</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        This method is the same than the original SamPredictor</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;This method is the same than the original SamPredictor besides that a dropout layer is used on the image encoding.</span>
+<span class="sd">        </span>
 <span class="sd">        Predict masks for the given input prompts, using the currently set image.</span>
 <span class="sd">        Input prompts are batched torch tensors and are expected to already be</span>
 <span class="sd">        transformed to the input frame using ResizeLongestSide.</span>
@@ -185,7 +190,7 @@
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2023, Clément Yvernes.</p>
+    <p>&#169; Copyright 2023, Clément Yvernes &amp; Rosetta Hu.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

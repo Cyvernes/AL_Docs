@@ -52,6 +52,7 @@
 <li class="toctree-l2"><a class="reference internal" href="filters.html">Filters</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">First seed selection</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#first_seeds_selector.aGivenAmountOfForegroundSESeeds"><code class="docutils literal notranslate"><span class="pre">aGivenAmountOfForegroundSESeeds()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#first_seeds_selector.aGivenAmountOfSESeeds"><code class="docutils literal notranslate"><span class="pre">aGivenAmountOfSESeeds()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#first_seeds_selector.allForegroundSESeeds"><code class="docutils literal notranslate"><span class="pre">allForegroundSESeeds()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#first_seeds_selector.allSESeeds"><code class="docutils literal notranslate"><span class="pre">allSESeeds()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#first_seeds_selector.popLastSESeeds"><code class="docutils literal notranslate"><span class="pre">popLastSESeeds()</span></code></a></li>
@@ -99,6 +100,27 @@
 <span class="sig-prename descclassname"><span class="pre">first_seeds_selector.</span></span><span class="sig-name descname"><span class="pre">aGivenAmountOfForegroundSESeeds</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">learner</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="Learners.html#Learners.ActiveLearningSAM" title="Learners.ActiveLearningSAM"><span class="pre">ActiveLearningSAM</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/first_seeds_selector.html#aGivenAmountOfForegroundSESeeds"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#first_seeds_selector.aGivenAmountOfForegroundSESeeds" title="Permalink to this definition"></a></dt>
 <dd><dl class="simple">
 <dt>This function encodes a strategy to find the first point to annotate.</dt><dd><p>A specific number of foreground SE seeds is selected.
+learner.SE_seeds is updated accordingly.</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>learner</strong> (<a class="reference internal" href="Learners.html#Learners.ActiveLearningSAM" title="Learners.ActiveLearningSAM"><em>ActiveLearningSAM</em></a>) – Learner</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>List of first points to annotate.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List[Tuple[int, int]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="first_seeds_selector.aGivenAmountOfSESeeds">
+<span class="sig-prename descclassname"><span class="pre">first_seeds_selector.</span></span><span class="sig-name descname"><span class="pre">aGivenAmountOfSESeeds</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">learner</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="Learners.html#Learners.ActiveLearningSAM" title="Learners.ActiveLearningSAM"><span class="pre">ActiveLearningSAM</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/first_seeds_selector.html#aGivenAmountOfSESeeds"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#first_seeds_selector.aGivenAmountOfSESeeds" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>This function encodes a strategy to find the first point to annotate.</dt><dd><p>A specific number of SE seeds is selected.
 learner.SE_seeds is updated accordingly.</p>
 </dd>
 </dl>

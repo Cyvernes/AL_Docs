@@ -138,7 +138,9 @@ available for annotation in the SE_Seeds list.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="Learners.ActiveLearningSAM.findNextSeeds">
 <span class="sig-name descname"><span class="pre">findNextSeeds</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span></span></span><a class="reference internal" href="_modules/Learners.html#ActiveLearningSAM.findNextSeeds"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Learners.ActiveLearningSAM.findNextSeeds" title="Permalink to this definition"></a></dt>
-<dd><p>Uses the evidence map and uncertainty map to sample the next seed for annotation.</p>
+<dd><p>Uses the evidence map and uncertainty map to sample the next seeds for annotation.</p>
+<p>The sampling strategy is selected by the strategy_selector that computes the current strategy index (current_strategy_idx).
+If the strategy index is greater than the number of strategies in seeds_selection_strategies, then the strategy is selected modulo the number of available strategies.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>The next seeds (points) to annotate based on the selected strategy.</p>
@@ -155,9 +157,9 @@ available for annotation in the SE_Seeds list.</p>
 <dd><p>Implements an iteration of active learning to improve segmentation.</p>
 <p>This method represents a single iteration of the active learning process, where new seeds
 (input_points) and their corresponding labels (input_labels) are used to enhance the
-segmentation. The evidence and uncertainty map are updated according to the selected learning strategy.
-The learning strategy is selected by the strategy_selector that computes the current strategy index (current_strategy_idx).
-The corresponding strategy, modulo the number of strategies,in learning_strategies is used.</p>
+segmentation. The evidence and uncertainty map are updated according to the selected learning strategy.</p>
+<p>The learning strategy is selected by the strategy_selector that computes the current strategy index (current_strategy_idx).
+If the strategy index is greater than the number of strategies in learning_strategies, then the strategy is selected modulo the number of available strategies.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">

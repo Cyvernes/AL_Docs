@@ -56,6 +56,7 @@
 <li class="toctree-l2"><a class="reference internal" href="run_model.html">run_model module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="strategy_selectors.html">Strategy selectors</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Tools</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#tools.DiceLoss"><code class="docutils literal notranslate"><span class="pre">DiceLoss()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#tools.FN"><code class="docutils literal notranslate"><span class="pre">FN()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#tools.FP"><code class="docutils literal notranslate"><span class="pre">FP()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#tools.IoU"><code class="docutils literal notranslate"><span class="pre">IoU()</span></code></a></li>
@@ -103,6 +104,26 @@
              
   <section id="module-tools">
 <span id="tools"></span><h1>Tools<a class="headerlink" href="#module-tools" title="Permalink to this heading"></a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="tools.DiceLoss">
+<span class="sig-prename descclassname"><span class="pre">tools.</span></span><span class="sig-name descname"><span class="pre">DiceLoss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mask1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference internal" href="_modules/tools.html#DiceLoss"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tools.DiceLoss" title="Permalink to this definition"></a></dt>
+<dd><p>Computes the dice loss of two masks.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mask1</strong> (<em>np.ndarray</em>) – Mask 1</p></li>
+<li><p><strong>mask2</strong> (<em>np.ndarray</em>) – Mask 2</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Dice loss</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py function">
 <dt class="sig sig-object py" id="tools.FN">
 <span class="sig-prename descclassname"><span class="pre">tools.</span></span><span class="sig-name descname"><span class="pre">FN</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mask1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference internal" href="_modules/tools.html#FN"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tools.FN" title="Permalink to this definition"></a></dt>

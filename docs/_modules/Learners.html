@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Learners &mdash; Active Learning For Connectomics 0.1 documentation</title>
+  <title>Learners &mdash; Active Learning For Connectomics 0.2 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -69,29 +69,34 @@
            <div itemprop="articleBody">
              
   <h1>Source code for Learners</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">import</span> <span class="nn">torchvision</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">cv2</span>
-<span class="kn">import</span> <span class="nn">sys</span>
-<span class="kn">import</span> <span class="nn">json</span>
-<span class="kn">import</span> <span class="nn">time</span>
+<span></span><span class="kn">import</span> <span class="nn">json</span>
 <span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">from</span> <span class="nn">segment_anything</span> <span class="kn">import</span> <span class="n">sam_model_registry</span><span class="p">,</span> <span class="n">SamAutomaticMaskGenerator</span><span class="p">,</span> <span class="n">SamPredictor</span>
 <span class="kn">import</span> <span class="nn">random</span>
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">time</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
-<span class="kn">from</span> <span class="nn">tools</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="kn">from</span> <span class="nn">plot_tools</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="kn">from</span> <span class="nn">filters</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="kn">from</span> <span class="nn">strategy_selectors</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="kn">from</span> <span class="nn">next_seeds_strategies</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="kn">from</span> <span class="nn">SAM_modifications</span> <span class="kn">import</span> <span class="n">SamPredictorWithDropOut</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span>
+
+<span class="kn">import</span> <span class="nn">cv2</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">import</span> <span class="nn">torchvision</span>
+<span class="kn">from</span> <span class="nn">segment_anything</span> <span class="kn">import</span> <span class="p">(</span><span class="n">SamAutomaticMaskGenerator</span><span class="p">,</span> <span class="n">SamPredictor</span><span class="p">,</span>
+                              <span class="n">sam_model_registry</span><span class="p">)</span>
+
+<span class="kn">from</span> <span class="nn">filters</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">next_seeds_strategies</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">plot_tools</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">SAM_modifications</span> <span class="kn">import</span> <span class="n">SamPredictorWithDropOut</span>
+<span class="kn">from</span> <span class="nn">strategy_selectors</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">tools</span> <span class="kn">import</span> <span class="o">*</span>
+
 
 
 <div class="viewcode-block" id="ActiveLearningSAM"><a class="viewcode-back" href="../Learners.html#Learners.ActiveLearningSAM">[docs]</a><span class="k">class</span> <span class="nc">ActiveLearningSAM</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;This is the fundamental class for the active Learning for Connectomics project.</span>
+<span class="sd">    This class should be used for every active learner that need not access ground truth.</span>
 <span class="sd">    </span>
 <span class="sd">    Please note that this class does not have direct access to Ground Truth data. </span>
 <span class="sd">    Instead, it is designed to work in conjunction with other components of the project to incorporate Ground Truth feedback during active learning iterations.</span>
@@ -218,7 +223,7 @@
 <div class="viewcode-block" id="ActiveLearningSAM.findFirstSeeds"><a class="viewcode-back" href="../Learners.html#Learners.ActiveLearningSAM.findFirstSeeds">[docs]</a>    <span class="k">def</span> <span class="nf">findFirstSeeds</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]],</span> <span class="nb">int</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute the first points to annotate.    </span>
 <span class="sd">        </span>
-<span class="sd">        This method calls the initial seed selection process usually based on the Segment Everything (SE)</span>
+<span class="sd">        This method calls the initial seed selection process (first_seeds_selector) usually based on the Segment Everything (SE)</span>
 <span class="sd">        approach. It generates a list of first seeds for annotation and computes the number of seeds</span>
 <span class="sd">        available for annotation in the SE_Seeds list.</span>
 <span class="sd">    </span>
@@ -245,6 +250,8 @@
 <span class="sd">        This method represents a single iteration of the active learning process, where new seeds</span>
 <span class="sd">        (input_points) and their corresponding labels (input_labels) are used to enhance the</span>
 <span class="sd">        segmentation. The evidence and uncertainty map are updated according to the selected learning strategy.</span>
+<span class="sd">        The learning strategy is selected by the strategy_selector that computes the current strategy index (current_strategy_idx).</span>
+<span class="sd">        The corresponding strategy, modulo the number of strategies,in learning_strategies is used.</span>
 
 <span class="sd">        :param input_points: Input seeds</span>
 <span class="sd">        :type input_points: list</span>
@@ -500,7 +507,7 @@
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2023, Clément Yvernes.</p>
+    <p>&#169; Copyright 2023, Clément Yvernes &amp; Rosetta Hu.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

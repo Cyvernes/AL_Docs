@@ -105,9 +105,9 @@
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">model</span><span class="p">,</span>
         <span class="n">strategy_selector</span><span class="p">,</span>
-        <span class="n">learning_strategies</span><span class="p">,</span>
+        <span class="n">learning_strategies</span> <span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
         <span class="n">first_seeds_selector</span><span class="p">,</span>
-        <span class="n">seeds_selection_strategies</span><span class="p">,</span>
+        <span class="n">seeds_selection_strategies</span> <span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
         <span class="n">uncertainty_fn</span><span class="p">,</span>
         <span class="n">filtering_fn</span><span class="p">,</span>
         <span class="n">filtering_aux_fn</span><span class="p">,</span>
@@ -117,28 +117,28 @@
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Constructor of the ActiveLearningSAM class</span>
 
-<span class="sd">        :param model: Model used in segmentation (usually it&#39;s SAM)</span>
+<span class="sd">        :param model: Model used in segmentation (usually it&#39;s SAM).</span>
 <span class="sd">        :type model: _type_</span>
-<span class="sd">        :param strategy_selector: Function that selects wich strategy will be used</span>
+<span class="sd">        :param strategy_selector: Function that selects wich strategy will be used.</span>
 <span class="sd">        :type strategy_selector: _type_</span>
-<span class="sd">        :param learning_strategies: Every learning strategies that will be used during the experiment</span>
-<span class="sd">        :type learning_strategies: _type_</span>
-<span class="sd">        :param first_seeds_selector: Function that selects the first points to annotate</span>
+<span class="sd">        :param learning_strategies: List of learning strategies to be used during the experiment.</span>
+<span class="sd">        :type learning_strategies: list</span>
+<span class="sd">        :param first_seeds_selector: Function that selects the first points to annotate.</span>
 <span class="sd">        :type first_seeds_selector: _type_</span>
-<span class="sd">        :param seeds_selection_strategies: Sampling strategies that will be used during the experiment</span>
-<span class="sd">        :type seeds_selection_strategies: _type_</span>
-<span class="sd">        :param uncertainty_fn: Function that computes the uncertainty map from the evidence map</span>
+<span class="sd">        :param seeds_selection_strategies: Sampling strategies to be used during the experiment.</span>
+<span class="sd">        :type seeds_selection_strategies: list</span>
+<span class="sd">        :param uncertainty_fn: Function that computes the uncertainty map from the evidence map.</span>
 <span class="sd">        :type uncertainty_fn: _type_</span>
-<span class="sd">        :param filtering_fn: Function used as a filter during sampling of the next seeds</span>
+<span class="sd">        :param filtering_fn: Function used as a filter during the sampling of the next seeds.</span>
 <span class="sd">        :type filtering_fn: _type_</span>
-<span class="sd">        :param filtering_aux_fn: Auxiliary function that computes the region of interest for the filter</span>
+<span class="sd">        :param filtering_aux_fn: Auxiliary function that computes the region of interest for the filter.</span>
 <span class="sd">        :type filtering_aux_fn: _type_</span>
-<span class="sd">        :param image: Image to segment, defaults to None</span>
-<span class="sd">        :type image: _type_, optional</span>
-<span class="sd">        :param mask_generator: Automatic mask generator, defaults to None</span>
+<span class="sd">        :param image: Image to segment, defaults to None.</span>
+<span class="sd">        :type image: np.ndarray, optional</span>
+<span class="sd">        :param mask_generator: Automatic mask generator, defaults to None.</span>
 <span class="sd">        :type mask_generator: _type_, optional</span>
-<span class="sd">        :param use_previous_logits: _description_, defaults to True</span>
-<span class="sd">        :type use_previous_logits: Parameter for the predictor. If set to true the predictor will use previous prediction during prediction, optional</span>
+<span class="sd">        :param use_previous_logits: Parameter for the predictor. If set to true the predictor will use previous prediction during prediction, defaults to True.</span>
+<span class="sd">        :type use_previous_logits: bool, optional</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">model</span>
@@ -313,40 +313,40 @@
     <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Constructor of the FPFNLearner class.</span>
 
-<span class="sd">        :param model: Model used in segmentation (usually it&#39;s SAM)</span>
+<span class="sd">        :param model: Model used in segmentation (usually it&#39;s SAM).</span>
 <span class="sd">        :type model: _type_</span>
-<span class="sd">        :param strategy_selector: Function that selects wich strategy will be used</span>
+<span class="sd">        :param strategy_selector: Function that selects wich strategy will be used.</span>
 <span class="sd">        :type strategy_selector: _type_</span>
-<span class="sd">        :param learning_strategies: Every learning strategies that will be used during the experiment</span>
-<span class="sd">        :type learning_strategies: _type_</span>
-<span class="sd">        :param first_seeds_selector: Function that selects the first points to annotate</span>
+<span class="sd">        :param learning_strategies: List of learning strategies to be used during the experiment.</span>
+<span class="sd">        :type learning_strategies: list</span>
+<span class="sd">        :param first_seeds_selector: Function that selects the first points to annotate.</span>
 <span class="sd">        :type first_seeds_selector: _type_</span>
-<span class="sd">        :param seeds_selection_strategies: Sampling strategies that will be used during the experiment</span>
-<span class="sd">        :type seeds_selection_strategies: _type_</span>
-<span class="sd">        :param uncertainty_fn: Function that computes the uncertainty map from the evidence map</span>
+<span class="sd">        :param seeds_selection_strategies: Sampling strategies to be used during the experiment.</span>
+<span class="sd">        :type seeds_selection_strategies: list</span>
+<span class="sd">        :param uncertainty_fn: Function that computes the uncertainty map from the evidence map.</span>
 <span class="sd">        :type uncertainty_fn: _type_</span>
-<span class="sd">        :param filtering_fn: Function used as a filter during sampling of the next seeds</span>
+<span class="sd">        :param filtering_fn: Function used as a filter during the sampling of the next seeds.</span>
 <span class="sd">        :type filtering_fn: _type_</span>
-<span class="sd">        :param filtering_aux_fn: Auxiliary function that computes the region of interest for the filter</span>
+<span class="sd">        :param filtering_aux_fn: Auxiliary function that computes the region of interest for the filter.</span>
 <span class="sd">        :type filtering_aux_fn: _type_</span>
-<span class="sd">        :param image: Image to segment, defaults to None</span>
-<span class="sd">        :type image: _type_, optional</span>
-<span class="sd">        :param mask_generator: Automatic mask generator, defaults to None</span>
+<span class="sd">        :param image: Image to segment, defaults to None.</span>
+<span class="sd">        :type image: np.ndarray, optional</span>
+<span class="sd">        :param mask_generator: Automatic mask generator, defaults to None.</span>
 <span class="sd">        :type mask_generator: _type_, optional</span>
-<span class="sd">        :param use_previous_logits: Parameter for the predictor. If set to true the predictor will use previous prediction during prediction, defaults to True</span>
+<span class="sd">        :param use_previous_logits: Parameter for the predictor. If set to true the predictor will use previous prediction during prediction, defaults to True.</span>
 <span class="sd">        :type use_previous_logits: bool, optional</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="n">model</span><span class="p">,</span>
-            <span class="n">strategy_selector</span><span class="p">,</span>
-            <span class="n">learning_strategies</span><span class="p">,</span>
-            <span class="n">seeds_selection_strategies</span><span class="p">,</span>
-            <span class="n">uncertainty_fn</span><span class="p">,</span>
-            <span class="n">filtering_fn</span><span class="p">,</span>
-            <span class="n">filtering_aux_fn</span><span class="p">,</span>
-            <span class="n">image</span><span class="p">,</span>
-            <span class="n">mask_generator</span><span class="p">,</span>
-            <span class="n">use_previous_logits</span><span class="p">,</span>
+            <span class="n">strategy_selector</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">learning_strategies</span><span class="o">=</span><span class="p">[],</span>
+            <span class="n">seeds_selection_strategies</span><span class="o">=</span><span class="p">[],</span>
+            <span class="n">uncertainty_fn</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">filtering_fn</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">filtering_aux_fn</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">image</span><span class="o">=</span><span class="n">image</span><span class="p">,</span>
+            <span class="n">mask_generator</span><span class="o">=</span><span class="n">mask_decorator</span><span class="p">,</span>
+            <span class="n">use_previous_logits</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">GT_mask</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">need_ground_truth</span> <span class="o">=</span> <span class="kc">True</span>
@@ -394,40 +394,40 @@
     <span class="p">):</span> 
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Constructor of the RandomLearner class</span>
 
-<span class="sd">        :param model: Model used in segmentation (usually it&#39;s SAM)</span>
+<span class="sd">        :param model: Model used in segmentation (usually it&#39;s SAM).</span>
 <span class="sd">        :type model: _type_</span>
-<span class="sd">        :param strategy_selector: Function that selects wich strategy will be used</span>
+<span class="sd">        :param strategy_selector: Function that selects wich strategy will be used.</span>
 <span class="sd">        :type strategy_selector: _type_</span>
-<span class="sd">        :param learning_strategies: Every learning strategies that will be used during the experiment</span>
-<span class="sd">        :type learning_strategies: _type_</span>
-<span class="sd">        :param first_seeds_selector: Function that selects the first points to annotate</span>
+<span class="sd">        :param learning_strategies: List of learning strategies to be used during the experiment.</span>
+<span class="sd">        :type learning_strategies: list</span>
+<span class="sd">        :param first_seeds_selector: Function that selects the first points to annotate.</span>
 <span class="sd">        :type first_seeds_selector: _type_</span>
-<span class="sd">        :param seeds_selection_strategies: Sampling strategies that will be used during the experiment</span>
-<span class="sd">        :type seeds_selection_strategies: _type_</span>
-<span class="sd">        :param uncertainty_fn: Function that computes the uncertainty map from the evidence map</span>
+<span class="sd">        :param seeds_selection_strategies: Sampling strategies to be used during the experiment.</span>
+<span class="sd">        :type seeds_selection_strategies: list</span>
+<span class="sd">        :param uncertainty_fn: Function that computes the uncertainty map from the evidence map.</span>
 <span class="sd">        :type uncertainty_fn: _type_</span>
-<span class="sd">        :param filtering_fn: Function used as a filter during sampling of the next seeds</span>
+<span class="sd">        :param filtering_fn: Function used as a filter during the sampling of the next seeds.</span>
 <span class="sd">        :type filtering_fn: _type_</span>
-<span class="sd">        :param filtering_aux_fn: Auxiliary function that computes the region of interest for the filter</span>
+<span class="sd">        :param filtering_aux_fn: Auxiliary function that computes the region of interest for the filter.</span>
 <span class="sd">        :type filtering_aux_fn: _type_</span>
-<span class="sd">        :param image: Image to segment, defaults to None</span>
-<span class="sd">        :type image: _type_, optional</span>
-<span class="sd">        :param mask_generator: Automatic mask generator, defaults to None</span>
+<span class="sd">        :param image: Image to segment, defaults to None.</span>
+<span class="sd">        :type image: np.ndarray, optional</span>
+<span class="sd">        :param mask_generator: Automatic mask generator, defaults to None.</span>
 <span class="sd">        :type mask_generator: _type_, optional</span>
-<span class="sd">        :param use_previous_logits: Parameter for the predictor. If set to true the predictor will use previous prediction during prediction, defaults to True</span>
+<span class="sd">        :param use_previous_logits: Parameter for the predictor. If set to true the predictor will use previous prediction during prediction, defaults to True.</span>
 <span class="sd">        :type use_previous_logits: bool, optional</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="n">model</span><span class="p">,</span>
-            <span class="n">strategy_selector</span><span class="p">,</span>
-            <span class="n">learning_strategies</span><span class="p">,</span>
-            <span class="n">seeds_selection_strategies</span><span class="p">,</span>
-            <span class="n">uncertainty_fn</span><span class="p">,</span>
-            <span class="n">filtering_fn</span><span class="p">,</span>
-            <span class="n">filtering_aux_fn</span><span class="p">,</span>
-            <span class="n">image</span><span class="p">,</span>
-            <span class="n">mask_generator</span><span class="p">,</span>
-            <span class="n">use_previous_logits</span><span class="p">,</span>
+            <span class="n">strategy_selector</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">learning_strategies</span><span class="o">=</span><span class="p">[],</span>
+            <span class="n">seeds_selection_strategies</span><span class="o">=</span><span class="p">[],</span>
+            <span class="n">uncertainty_fn</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">filtering_fn</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">filtering_aux_fn</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">image</span><span class="o">=</span><span class="n">image</span><span class="p">,</span>
+            <span class="n">mask_generator</span><span class="o">=</span><span class="n">mask_generator</span><span class="p">,</span>
+            <span class="n">use_previous_logits</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># Select the seed for the pseudo-random generator to ensure reproducibility.</span>
 

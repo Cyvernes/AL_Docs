@@ -196,11 +196,17 @@ are reinitialized to facilitate the segmentation process.</p>
 <dt class="sig sig-object py" id="Learners.FPFNLearner">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">Learners.</span></span><span class="sig-name descname"><span class="pre">FPFNLearner</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strategy_selector</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">learning_strategies</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seeds_selection_strategies</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uncertainty_fn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filtering_fn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filtering_aux_fn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask_generator</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_previous_logits</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Learners.html#FPFNLearner"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Learners.FPFNLearner" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#Learners.ActiveLearningSAM" title="Learners.ActiveLearningSAM"><code class="xref py py-class docutils literal notranslate"><span class="pre">ActiveLearningSAM</span></code></a></p>
-<p>This class is not an active learner. Seeds are selected accoring to the most arrorous point.</p>
+<p>This class is not an active learner because it can access ground truth.
+It has been implemented to compare active learners to other type of learners.
+Seeds are selected based on false positive and false negative pixels.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="Learners.FPFNLearner.findNextSeeds">
 <span class="sig-name descname"><span class="pre">findNextSeeds</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span></span></span><a class="reference internal" href="_modules/Learners.html#FPFNLearner.findNextSeeds"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Learners.FPFNLearner.findNextSeeds" title="Permalink to this definition"></a></dt>
-<dd><p>Samples next seed using the false positive pixels and the false negative pixels.</p>
+<dd><p>Samples the next seed using the false positive and false negative pixels.</p>
+<p>This method selects the next seed (point) for annotation based on the difference between the
+ground truth mask and the current predicted mask (false positive and false negative pixels).
+The selected seed aims to target regions with higher segmentation errors for further annotation
+and improvement.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Next seed to annotate (in a list)</p>
@@ -214,10 +220,10 @@ are reinitialized to facilitate the segmentation process.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="Learners.FPFNLearner.setGroundTruthMask">
 <span class="sig-name descname"><span class="pre">setGroundTruthMask</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mask</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Learners.html#FPFNLearner.setGroundTruthMask"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Learners.FPFNLearner.setGroundTruthMask" title="Permalink to this definition"></a></dt>
-<dd><p>Sets the ground truth mask</p>
+<dd><p>Sets the ground truth mask.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>mask</strong> (<em>np.ndarray</em>) – Ground truth mask</p>
+<dd class="field-odd"><p><strong>mask</strong> (<em>np.ndarray</em>) – Ground truth mask.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -228,16 +234,16 @@ are reinitialized to facilitate the segmentation process.</p>
 <dt class="sig sig-object py" id="Learners.PseudoActiveLearningSAM">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">Learners.</span></span><span class="sig-name descname"><span class="pre">PseudoActiveLearningSAM</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strategy_selector</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">learning_strategies</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">first_seeds_selector</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seeds_selection_strategies</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uncertainty_fn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filtering_fn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filtering_aux_fn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask_generator</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_previous_logits</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Learners.html#PseudoActiveLearningSAM"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Learners.PseudoActiveLearningSAM" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#Learners.ActiveLearningSAM" title="Learners.ActiveLearningSAM"><code class="xref py py-class docutils literal notranslate"><span class="pre">ActiveLearningSAM</span></code></a></p>
-<p>This class is an active Learner but it can acces ground truth.
-This allows to simulate specific settings that need to use the ground truth.
-For instance, giving all foreground points at the beginning can only be done in this class.</p>
+<p>This class is an active learner that can access the ground truth.
+It allows simulating specific settings that need to use the ground truth.
+For instance, providing all foreground points at the beginning can only be done in this class.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="Learners.PseudoActiveLearningSAM.setGroundTruthMask">
 <span class="sig-name descname"><span class="pre">setGroundTruthMask</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mask</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/Learners.html#PseudoActiveLearningSAM.setGroundTruthMask"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Learners.PseudoActiveLearningSAM.setGroundTruthMask" title="Permalink to this definition"></a></dt>
-<dd><p>Set the ground truth mask</p>
+<dd><p>Set the ground truth mask.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>mask</strong> (<em>np.ndarray</em>) – Ground truth mask</p>
+<dd class="field-odd"><p><strong>mask</strong> (<em>np.ndarray</em>) – Ground truth mask.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -248,11 +254,15 @@ For instance, giving all foreground points at the beginning can only be done in 
 <dt class="sig sig-object py" id="Learners.RandomLearner">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">Learners.</span></span><span class="sig-name descname"><span class="pre">RandomLearner</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strategy_selector</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">learning_strategies</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seeds_selection_strategies</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uncertainty_fn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filtering_fn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filtering_aux_fn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask_generator</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_previous_logits</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Learners.html#RandomLearner"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Learners.RandomLearner" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#Learners.ActiveLearningSAM" title="Learners.ActiveLearningSAM"><code class="xref py py-class docutils literal notranslate"><span class="pre">ActiveLearningSAM</span></code></a></p>
-<p>This class is not an active learner, next seeds are chosen at random</p>
+<p>This class is not an active learner&lt;;
+Seeds are chosen randomly without employing active learning strategies.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="Learners.RandomLearner.findNextSeeds">
 <span class="sig-name descname"><span class="pre">findNextSeeds</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="reference internal" href="_modules/Learners.html#RandomLearner.findNextSeeds"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Learners.RandomLearner.findNextSeeds" title="Permalink to this definition"></a></dt>
-<dd><p>Samples next seed using the false positive pixels and the false negative pixels.</p>
+<dd><p>Samples the next seed using random pixel coordinates within the image.</p>
+<p>This method selects the next seed (point) for annotation by randomly choosing
+pixel coordinates within the image’s dimensions. The selection is independent of
+segmentation performance or active learning strategies.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Next seed to annotate (in a list)</p>

@@ -294,7 +294,9 @@
 
 
 <div class="viewcode-block" id="FPFNLearner"><a class="viewcode-back" href="../Learners.html#Learners.FPFNLearner">[docs]</a><span class="k">class</span> <span class="nc">FPFNLearner</span><span class="p">(</span><span class="n">ActiveLearningSAM</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;This class is not an active learner. Seeds are selected accoring to the most arrorous point.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;This class is not an active learner because it can access ground truth.</span>
+<span class="sd">    It has been implemented to compare active learners to other type of learners.</span>
+<span class="sd">    Seeds are selected based on false positive and false negative pixels.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -309,7 +311,7 @@
         <span class="n">mask_generator</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">use_previous_logits</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Constructor of the FPFNLearner class</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Constructor of the FPFNLearner class.</span>
 
 <span class="sd">        :param model: Model used in segmentation (usually it&#39;s SAM)</span>
 <span class="sd">        :type model: _type_</span>
@@ -350,15 +352,20 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">need_ground_truth</span> <span class="o">=</span> <span class="kc">True</span>
     
 <div class="viewcode-block" id="FPFNLearner.setGroundTruthMask"><a class="viewcode-back" href="../Learners.html#Learners.FPFNLearner.setGroundTruthMask">[docs]</a>    <span class="k">def</span> <span class="nf">setGroundTruthMask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mask</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Sets the ground truth mask</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Sets the ground truth mask.</span>
 
-<span class="sd">        :param mask: Ground truth mask</span>
+<span class="sd">        :param mask: Ground truth mask.</span>
 <span class="sd">        :type mask: np.ndarray</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">GT_mask</span> <span class="o">=</span> <span class="n">mask</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;uint8&quot;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="FPFNLearner.findNextSeeds"><a class="viewcode-back" href="../Learners.html#Learners.FPFNLearner.findNextSeeds">[docs]</a>    <span class="k">def</span> <span class="nf">findNextSeeds</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Samples next seed using the false positive pixels and the false negative pixels.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Samples the next seed using the false positive and false negative pixels.</span>
+
+<span class="sd">        This method selects the next seed (point) for annotation based on the difference between the</span>
+<span class="sd">        ground truth mask and the current predicted mask (false positive and false negative pixels).</span>
+<span class="sd">        The selected seed aims to target regions with higher segmentation errors for further annotation</span>
+<span class="sd">        and improvement.</span>
 
 <span class="sd">        :return: Next seed to annotate (in a list)</span>
 <span class="sd">        :rtype: list</span>
@@ -369,7 +376,8 @@
  
 
 <div class="viewcode-block" id="RandomLearner"><a class="viewcode-back" href="../Learners.html#Learners.RandomLearner">[docs]</a><span class="k">class</span> <span class="nc">RandomLearner</span><span class="p">(</span><span class="n">ActiveLearningSAM</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;This class is not an active learner, next seeds are chosen at random</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;This class is not an active learner&lt;;</span>
+<span class="sd">    Seeds are chosen randomly without employing active learning strategies.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -385,7 +393,6 @@
         <span class="n">use_previous_logits</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="p">):</span> 
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Constructor of the RandomLearner class</span>
-<span class="sd">        Sampling is done at random</span>
 
 <span class="sd">        :param model: Model used in segmentation (usually it&#39;s SAM)</span>
 <span class="sd">        :type model: _type_</span>
@@ -422,11 +429,15 @@
             <span class="n">mask_generator</span><span class="p">,</span>
             <span class="n">use_previous_logits</span><span class="p">,</span>
         <span class="p">)</span>
-        <span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># select seed for pseudo random generator</span>
+        <span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># Select the seed for the pseudo-random generator to ensure reproducibility.</span>
 
 <div class="viewcode-block" id="RandomLearner.findNextSeeds"><a class="viewcode-back" href="../Learners.html#Learners.RandomLearner.findNextSeeds">[docs]</a>    <span class="k">def</span> <span class="nf">findNextSeeds</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Samples next seed using the false positive pixels and the false negative pixels.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Samples the next seed using random pixel coordinates within the image.</span>
 
+<span class="sd">        This method selects the next seed (point) for annotation by randomly choosing</span>
+<span class="sd">        pixel coordinates within the image&#39;s dimensions. The selection is independent of</span>
+<span class="sd">        segmentation performance or active learning strategies.</span>
+<span class="sd">        </span>
 <span class="sd">        :return: Next seed to annotate (in a list)</span>
 <span class="sd">        :rtype: list</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -436,9 +447,9 @@
 
 
 <div class="viewcode-block" id="PseudoActiveLearningSAM"><a class="viewcode-back" href="../Learners.html#Learners.PseudoActiveLearningSAM">[docs]</a><span class="k">class</span> <span class="nc">PseudoActiveLearningSAM</span><span class="p">(</span><span class="n">ActiveLearningSAM</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;This class is an active Learner but it can acces ground truth. </span>
-<span class="sd">    This allows to simulate specific settings that need to use the ground truth.</span>
-<span class="sd">    For instance, giving all foreground points at the beginning can only be done in this class.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;This class is an active learner that can access the ground truth.</span>
+<span class="sd">    It allows simulating specific settings that need to use the ground truth.</span>
+<span class="sd">    For instance, providing all foreground points at the beginning can only be done in this class.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -496,9 +507,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">need_ground_truth</span> <span class="o">=</span> <span class="kc">True</span>
 
 <div class="viewcode-block" id="PseudoActiveLearningSAM.setGroundTruthMask"><a class="viewcode-back" href="../Learners.html#Learners.PseudoActiveLearningSAM.setGroundTruthMask">[docs]</a>    <span class="k">def</span> <span class="nf">setGroundTruthMask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mask</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the ground truth mask</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the ground truth mask.</span>
 
-<span class="sd">        :param mask: Ground truth mask</span>
+<span class="sd">        :param mask: Ground truth mask.</span>
 <span class="sd">        :type mask: np.ndarray</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">GT_mask</span> <span class="o">=</span> <span class="n">mask</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;uint8&quot;</span><span class="p">)</span></div></div>

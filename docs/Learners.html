@@ -114,14 +114,15 @@
 <dt class="sig sig-object py" id="Learners.ActiveLearningSAM">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">Learners.</span></span><span class="sig-name descname"><span class="pre">ActiveLearningSAM</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strategy_selector</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">learning_strategies</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">first_seeds_selector</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seeds_selection_strategies</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uncertainty_fn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filtering_fn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filtering_aux_fn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask_generator</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_previous_logits</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Learners.html#ActiveLearningSAM"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Learners.ActiveLearningSAM" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>This is the fundamental class for the active Learning for Connectomics project.</p>
+<p>This is the fundamental class for the active Learning for Connectomics project.
+This class should be used for every active learner that need not access ground truth.</p>
 <p>Please note that this class does not have direct access to Ground Truth data.
 Instead, it is designed to work in conjunction with other components of the project to incorporate Ground Truth feedback during active learning iterations.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="Learners.ActiveLearningSAM.findFirstSeeds">
 <span class="sig-name descname"><span class="pre">findFirstSeeds</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/Learners.html#ActiveLearningSAM.findFirstSeeds"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Learners.ActiveLearningSAM.findFirstSeeds" title="Permalink to this definition"></a></dt>
 <dd><p>Compute the first points to annotate.</p>
-<p>This method calls the initial seed selection process usually based on the Segment Everything (SE)
+<p>This method calls the initial seed selection process (first_seeds_selector) usually based on the Segment Everything (SE)
 approach. It generates a list of first seeds for annotation and computes the number of seeds
 available for annotation in the SE_Seeds list.</p>
 <dl class="field-list simple">
@@ -154,7 +155,9 @@ available for annotation in the SE_Seeds list.</p>
 <dd><p>Implements an iteration of active learning to improve segmentation.</p>
 <p>This method represents a single iteration of the active learning process, where new seeds
 (input_points) and their corresponding labels (input_labels) are used to enhance the
-segmentation. The evidence and uncertainty map are updated according to the selected learning strategy.</p>
+segmentation. The evidence and uncertainty map are updated according to the selected learning strategy.
+The learning strategy is selected by the strategy_selector that computes the current strategy index (current_strategy_idx).
+The corresponding strategy, modulo the number of strategies,in learning_strategies is used.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">

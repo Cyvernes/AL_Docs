@@ -118,9 +118,9 @@
 <p>This class is the basic class for all learning strategy.
 Each learning strategy implements a segmentation stratey, an uncertainty strategy and a final_prediction strategy.
 It updates the Learner’s evidence map and current predicted masks using corresponding strategies.</p>
-<p>The segmentation strategy aims to have the best possible segmentation for already annotated objects.
-The uncertainty strategy aims to use every annotated points to estimate region of high uncertainty.
-The final prediction strategy use the results of the segmentation strategy and the uncertainty strategy to have a better segmentation.</p>
+<p>-The segmentation strategy aims to have the best possible segmentation for already annotated objects.
+-The uncertainty strategy aims to use every annotated points to estimate region of high uncertainty.
+-The final prediction strategy use the results of the segmentation strategy and the uncertainty strategy to have a better segmentation.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="learning_strategies.BasicLS.apply_dropout_parameters">
 <span class="sig-name descname"><span class="pre">apply_dropout_parameters</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/learning_strategies.html#BasicLS.apply_dropout_parameters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#learning_strategies.BasicLS.apply_dropout_parameters" title="Permalink to this definition"></a></dt>

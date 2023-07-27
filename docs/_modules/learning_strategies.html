@@ -81,9 +81,9 @@
 <span class="sd">    Each learning strategy implements a segmentation stratey, an uncertainty strategy and a final_prediction strategy.</span>
 <span class="sd">    It updates the Learner’s evidence map and current predicted masks using corresponding strategies.</span>
 <span class="sd">    </span>
-<span class="sd">    The segmentation strategy aims to have the best possible segmentation for already annotated objects.</span>
-<span class="sd">    The uncertainty strategy aims to use every annotated points to estimate region of high uncertainty.</span>
-<span class="sd">    The final prediction strategy use the results of the segmentation strategy and the uncertainty strategy to have a better segmentation.</span>
+<span class="sd">    -The segmentation strategy aims to have the best possible segmentation for already annotated objects.</span>
+<span class="sd">    -The uncertainty strategy aims to use every annotated points to estimate region of high uncertainty.</span>
+<span class="sd">    -The final prediction strategy use the results of the segmentation strategy and the uncertainty strategy to have a better segmentation.</span>
 <span class="sd">    </span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">learner</span> <span class="p">:</span> <span class="n">ActiveLearningSAM</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>

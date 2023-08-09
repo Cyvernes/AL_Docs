@@ -128,7 +128,7 @@
         <span class="n">min_evidence_thresh</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">min_p_thresh</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">min_p_thresh</span><span class="p">))</span>
     <span class="n">blob</span> <span class="o">=</span> <span class="n">learner</span><span class="o">.</span><span class="n">evidence</span> <span class="o">&lt;</span> <span class="n">max_evidence_thresh</span>
     <span class="k">if</span> <span class="n">min_p_thresh</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="n">blob</span><span class="p">[</span><span class="n">learner</span><span class="o">.</span><span class="n">evidence</span> <span class="o">&gt;</span> <span class="n">min_evidence_thresh</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">blob</span><span class="p">[</span><span class="n">learner</span><span class="o">.</span><span class="n">evidence</span> <span class="o">&lt;</span> <span class="n">min_evidence_thresh</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="n">blob</span> <span class="o">=</span> <span class="n">blob</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;uint8&quot;</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">blob</span></div>
 
@@ -332,7 +332,7 @@
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2023, Clément Yvernes &amp; Rosetta Hu.</p>
+    <p>&#169; Copyright 2023, Clément Yvernes &amp; Yifan (Rosetta) Hu.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

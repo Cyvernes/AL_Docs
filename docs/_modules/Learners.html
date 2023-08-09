@@ -151,7 +151,6 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">label_subsets</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># Used by FewSeedsForOneMask</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">input_labels</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">evidence</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">current_strategy_idx</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logits</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">a_priori</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">current_strategy_idx</span> <span class="o">=</span> <span class="mi">0</span>
@@ -218,7 +217,8 @@
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">a_priori</span> <span class="o">=</span> <span class="n">evidence</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">masks_from_single_seeds</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">a_priori</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;int16&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">nb_initial_seeds</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nb_initial_seeds</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nb_seed_used</span> <span class="o">=</span> <span class="mi">0</span></div>
 
 <div class="viewcode-block" id="ActiveLearningSAM.findFirstSeeds"><a class="viewcode-back" href="../Learners.html#Learners.ActiveLearningSAM.findFirstSeeds">[docs]</a>    <span class="k">def</span> <span class="nf">findFirstSeeds</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]],</span> <span class="nb">int</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute the first points to annotate.    </span>

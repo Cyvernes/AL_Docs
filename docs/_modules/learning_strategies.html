@@ -251,7 +251,9 @@
             <span class="n">evidence_temp</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">learner</span><span class="o">.</span><span class="n">predictor</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span>
                 <span class="n">point_coords</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">seed</span><span class="p">]),</span>
                 <span class="n">point_labels</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="kc">True</span><span class="p">]),</span>
-                <span class="n">mask_input</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                <span class="n">mask_input</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">learner</span><span class="o">.</span><span class="n">logits</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">learner</span><span class="o">.</span><span class="n">use_previous_logits</span>
+                    <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
                 <span class="n">multimask_output</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                 <span class="n">return_logits</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
             <span class="p">)</span>
@@ -261,7 +263,7 @@
             <span class="k">if</span> <span class="n">previous_prediction</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="c1"># visual_center = findVisualCenter(intersection_of_segmentation)</span>
                 <span class="c1"># value_at_visual_center = self.learner.masks_from_single_seeds  [visual_center[0], visual_center[1]]</span>
-                <span class="n">corresponding_subset</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">previous_prediction</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+                <span class="n">corresponding_subset</span> <span class="o">=</span> <span class="n">previous_prediction</span> <span class="o">-</span> <span class="mi">1</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">learner</span><span class="o">.</span><span class="n">seed_subsets</span><span class="p">[</span><span class="n">corresponding_subset</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">learner</span><span class="o">.</span><span class="n">input_points</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
                 <span class="p">)</span>
